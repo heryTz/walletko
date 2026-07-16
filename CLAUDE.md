@@ -7,3 +7,4 @@
 - Inside React components, prefer arrow functions over `function` declarations for handlers and callbacks.
 - Always use existing UI components (e.g. `Button`, `Input`) instead of raw HTML elements when an equivalent exists. If an elementary, reusable piece of UI has no existing component, create one rather than inlining raw markup.
 - Build on shadcn/ui components and its design system as much as possible. Prefer adding/composing shadcn/ui primitives over hand-rolling new ones, and follow shadcn/ui conventions (composition, variants via `cva`, the `cn` helper) when extending them.
+- Never commit brainstorming design specs or implementation plans, and never write them under `docs/`. Write them to `.superpowers/specs/` and `.superpowers/plans/`, which are git-ignored. They are session scaffolding, not project documentation. This overrides the superpowers skills' defaults (`docs/superpowers/**` and "commit the design document to git").
