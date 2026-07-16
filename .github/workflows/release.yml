@@ -44,10 +44,16 @@ jobs:
   release-please:
     name: Release PR
     runs-on: ubuntu-latest
+    # needs: [test] is load-bearing, not sequencing preference. release-please
+    # tags and cuts the Release itself; anything that runs after it cannot stop
+    # a release, only strand one (tag + Release exist, no image, :latest stale).
     needs: [test]
     if: github.event_name == 'push'
     permissions:
       contents: write
+      # issues: write is NOT unused. release-please labels its release PR
+      # (autorelease: pending) to find it again on later runs, and PR labels go
+      # through the issues API. Removing it makes releases silently stop.
       issues: write
       pull-requests: write
     outputs:
@@ -65,12 +71,19 @@ jobs:
     name: Publish release images
     runs-on: ubuntu-latest
     needs: [release-please]
+    # result == 'success' guards the case where release-please was skipped (PR)
+    # or never ran (test failed). Do not reduce this to the release_created
+    # check alone: a skipped job leaves release_created empty, and '' != 'true'
+    # is true — which would publish from a red or unreleased commit.
     if: needs.release-please.result == 'success' && needs.release-please.outputs.release_created == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+          # Check out the tag, not github.sha. With cancel-in-progress: false,
+          # GitHub cancels a pending run when a newer one queues; the surviving
+          # run's HEAD can then be a later commit than the one being released.
           ref: ${{ needs.release-please.outputs.tag_name }}
 
       - name: Resolve release date
@@ -115,6 +128,9 @@ jobs:
     name: Publish snapshot image
     runs-on: ubuntu-latest
     needs: [release-please]
+    # See publish's guard above — same reasoning, and it matters more here:
+    # without result == 'success', a failed test job would let this push :main
+    # from a red commit, since '' != 'true' evaluates true.
     if: needs.release-please.result == 'success' && needs.release-please.outputs.release_created != 'true'
     steps:
       - name: Checkout
