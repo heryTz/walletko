@@ -101,14 +101,14 @@ Triggers on `push` to `main` and `pull_request` targeting `main`. Four jobs:
 
 | Job | Runs when | Does |
 | --- | --- | --- |
-| `test` | every push and PR | `pnpm install --frozen-lockfile`, `pnpm test` |
+| `test` | every push and PR | `pnpm install --frozen-lockfile`, `pnpm build`, `pnpm test` |
 | `release-please` | `needs: [test]`, push only | Maintains the release PR. Outputs `release_created`, `version`, `tag_name`. |
 | `publish` | `needs: [release-please]`, `if release_created == 'true'` | Pushes versioned images |
 | `snapshot` | `needs: [release-please]`, `if release_created != 'true'` | Pushes `:main` images |
 
-**`test` gates everything.** `release-please` declares `needs: [test]`, so red tests block the tag rather than stranding a release. This ordering is load-bearing: if tests ran *after* `release-please`, a failure would leave `v0.1.0` tagged and released with no image in the registry, while `:latest` silently still pointed at the previous version.
+**`test` gates everything.** `release-please` declares `needs: [test]`, so a red build or red tests block the tag rather than stranding a release. This ordering is load-bearing: if `test` ran *after* `release-please`, a failure would leave `v0.1.0` tagged and released with no image in the registry, while `:latest` silently still pointed at the previous version. `test` builds (`pnpm build`) before it runs `pnpm test`, because `turbo.json`'s `test` task has no `dependsOn: ["build"]` and both apps' test scripts are a bare `vitest run` — without an explicit build step, `vite build` and the CLI's esbuild bundle are never exercised before a tag is cut.
 
-On a pull request, `release-please` is skipped, so `publish` and `snapshot` skip with it — PRs run tests and nothing else.
+On a pull request, `release-please` is skipped. GitHub gives an `if` without an explicit status-check function an implicit `success()`, and a skipped or failed `needs` job makes that `false` — so `publish` and `snapshot` skip with it, and PRs run tests and nothing else. `publish` and `snapshot` additionally check `needs.release-please.result == 'success'` explicitly; this is defense-in-depth against GitHub's own docs not clearly stating a skipped job's "reports its status as Success" propagates through `needs` outputs, not a claim that the implicit behaviour is insufficient on its own.
 
 **`publish`** builds from the release version:
 - `herytz/walletko:{version}` and `:latest`, with build args `APP_VERSION={version}` and `APP_RELEASE_DATE={date}`, where `{date}` is the UTC build date as `YYYY-MM-DD` — the format the app is already exercised with

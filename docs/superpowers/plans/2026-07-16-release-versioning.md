@@ -112,6 +112,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build
+        run: pnpm build
+
       - name: Run tests
         run: pnpm test
 
@@ -139,12 +142,13 @@ jobs:
     name: Publish release images
     runs-on: ubuntu-latest
     needs: [release-please]
-    if: github.event_name == 'push' && needs.release-please.outputs.release_created == 'true'
+    if: needs.release-please.result == 'success' && needs.release-please.outputs.release_created == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+          ref: ${{ needs.release-please.outputs.tag_name }}
 
       - name: Resolve release date
         id: meta
@@ -188,7 +192,7 @@ jobs:
     name: Publish snapshot image
     runs-on: ubuntu-latest
     needs: [release-please]
-    if: github.event_name == 'push' && needs.release-please.outputs.release_created != 'true'
+    if: needs.release-please.result == 'success' && needs.release-please.outputs.release_created != 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -228,8 +232,10 @@ jobs:
 Notes for the implementer — each of these is deliberate:
 
 - **`test` has no `if`**, so it runs on both events and gates everything downstream. This is the whole point of the task.
+- **`test` builds before it tests.** `turbo.json`'s `test` task has no `dependsOn: ["build"]`, and both apps' test scripts are a bare `vitest run` — neither exercises `vite build` or the CLI's esbuild bundle. Without an explicit `pnpm build` step ahead of `pnpm test`, a build-breaking change could pass `test` and reach `release-please`, which would tag and release before `publish`'s `docker build` (which runs `pnpm --filter walletko build` internally) discovers the break — stranding the release.
 - **`publish` and `snapshot` no longer install pnpm or Node.** They only build Docker images, and the Dockerfiles run their own `pnpm install` internally. The committed version installed the toolchain to run `pnpm test`; with `test` extracted, that setup is dead weight.
-- **The explicit `github.event_name == 'push'` guard on `publish` and `snapshot` is load-bearing, not redundant.** GitHub's docs state a skipped job "reports its status as Success," and do not clearly document whether a skipped `needs` propagates the skip downstream. If it does not, then on a pull request `release-please` is skipped, `needs.release-please.outputs.release_created` is the empty string, `'' != 'true'` evaluates **true**, and `snapshot` would push a `:main` image from a PR. The event guard makes both jobs correct under either semantics. Do not "simplify" it away.
+- **`publish` and `snapshot` gate on `needs.release-please.result == 'success'` in addition to `release_created`, not on `github.event_name`.** GitHub gives a custom `if` (one without an explicit status-check function) an implicit `success()`; a skipped or failed `needs` job makes that implicit check false, so `publish`/`snapshot` skip whenever `release-please` didn't run or didn't succeed — on pull requests and on `test` failures alike. The explicit `result == 'success'` check is defense-in-depth against GitHub's docs not clearly stating whether a skipped job's "reports its status as Success" propagates through `needs.<job>.outputs`; it is not load-bearing on its own. An `github.event_name == 'push'` guard would have been wrong regardless: on a `test` failure the workflow *is* still a push, so that guard cannot distinguish the failure path it was meant to hedge against — only a result check on `release-please` itself can.
+- **`publish` checks out `needs.release-please.outputs.tag_name`, not the default ref.** With `cancel-in-progress: false` on pushes to `main`, GitHub can cancel a pending run when a newer one queues; three rapid pushes could cancel the run whose commit was the release-PR merge, and a later run's `publish` would otherwise build from a commit past the release. Checking out the tag pins the build to the actual release commit. `snapshot` keeps the default checkout — a snapshot should build the commit that was pushed.
 - **`release_created` is compared against the string `'true'`.** Action outputs are always strings; a bare truthiness check passes even when the value is `"false"`.
 - **The outputs are unprefixed** (`release_created`, not `.--release_created`) because the package sits at path `.` in the manifest.
 - **`concurrency` with `cancel-in-progress` only on pull requests.** Two rapid pushes to `main` must queue, never cancel — cancelling could abort a release mid-flight. Two pushes to a PR branch should cancel the stale run. Without any concurrency group, two `main` pushes race and the slower build wins, leaving `:main` pointing at the *older* commit.
