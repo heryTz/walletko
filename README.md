@@ -2,6 +2,8 @@
 
 Physical budgeting, digitally. Split your money into pots the way you'd split cash into envelopes.
 
+![Walletko dashboard showing pot balances, monthly totals, and a yearly income/expense chart](preview.png)
+
 A bank account merges everything into one number, and that number is a lie — part of it is rent, part is savings you promised not to touch, part is genuinely free. Walletko puts the envelopes back.
 
 A pot is an envelope, but also a goal. Saving for a project? Give it a pot and a share of your income, and you can see it fill up.
