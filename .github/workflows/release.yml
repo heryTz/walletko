@@ -3,17 +3,19 @@ name: Release
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 permissions:
   contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  # Never cancel: a cancelled run can abort a release mid-flight. Queue instead.
+  cancel-in-progress: false
 
 jobs:
+  # Duplicated from ci.yml on purpose. ci.yml tests the PR's merge result; this
+  # tests what actually landed on main, and is what gates the tag below. Keep
+  # the two step lists in sync — if you add a step here, add it there too.
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -35,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Build before tests: `pnpm test` is vitest only and never runs vite /
+      # esbuild, so without this a broken build would only surface in `publish`
+      # — i.e. after the tag and Release already exist.
       - name: Build
         run: pnpm build
 
@@ -48,7 +53,6 @@ jobs:
     # tags and cuts the Release itself; anything that runs after it cannot stop
     # a release, only strand one (tag + Release exist, no image, :latest stale).
     needs: [test]
-    if: github.event_name == 'push'
     permissions:
       contents: write
       # issues: write is NOT unused. release-please labels its release PR
@@ -71,10 +75,9 @@ jobs:
     name: Publish release images
     runs-on: ubuntu-latest
     needs: [release-please]
-    # result == 'success' guards the case where release-please was skipped (PR)
-    # or never ran (test failed). Do not reduce this to the release_created
-    # check alone: a skipped job leaves release_created empty, and '' != 'true'
-    # is true — which would publish from a red or unreleased commit.
+    # result == 'success' guards the case where test failed, which skips
+    # release-please. Do not reduce this to the release_created check alone: a
+    # skipped job leaves release_created empty, and '' != 'true' is true.
     if: needs.release-please.result == 'success' && needs.release-please.outputs.release_created == 'true'
     steps:
       - name: Checkout
@@ -128,9 +131,8 @@ jobs:
     name: Publish snapshot image
     runs-on: ubuntu-latest
     needs: [release-please]
-    # See publish's guard above — same reasoning, and it matters more here:
-    # without result == 'success', a failed test job would let this push :main
-    # from a red commit, since '' != 'true' evaluates true.
+    # See publish's guard above — same reasoning: without result == 'success', a
+    # failed test job would let this push :main from a red commit.
     if: needs.release-please.result == 'success' && needs.release-please.outputs.release_created != 'true'
     steps:
       - name: Checkout
