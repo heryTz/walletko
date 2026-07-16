@@ -2,186 +2,77 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace the stale inherited `release.yml` with a release-please pipeline that tags one version for the whole repo, writes a changelog, and pushes versioned Docker images — plus a dev snapshot workflow.
+**Goal:** Replace the stale inherited `release.yml` with a single release-please workflow that tests, tags one version for the whole repo, writes a changelog, and pushes versioned or snapshot Docker images.
 
-**Architecture:** `release-please` maintains an open release PR on `main` that accumulates changelog entries from conventional commits. Merging that PR tags `v{version}`, cuts a GitHub Release, and triggers a publish job that pushes `herytz/walletko` and `herytz/finance-to-walletko` at that version. A separate workflow pushes unversioned `dev` images on every push to `dev`. Nothing deploys — the pipeline ends at the registry.
+**Architecture:** One workflow on `main`. A `test` job gates everything. `release-please` maintains an open release PR that accumulates changelog entries from conventional commits; merging it tags `v{version}` and publishes versioned images. Ordinary merges publish a `:main` snapshot instead. Pull requests run tests only. Nothing deploys — the pipeline ends at the registry.
 
-**Tech Stack:** GitHub Actions, `googleapis/release-please-action@v5`, Docker Buildx, pnpm 10 / Node 22, conventional commits (already enforced by commitlint).
+**Tech Stack:** GitHub Actions, `googleapis/release-please-action@v5`, Docker Buildx, pnpm 10 / Node 22, conventional commits (enforced by commitlint).
 
 **Spec:** `docs/superpowers/specs/2026-07-16-release-versioning-design.md`
+
+## Status
+
+Tasks 1–3 are **complete and committed** (`f3676ae`, `9e8e525`, `ba51222`), each reviewed clean. A final whole-branch review then found a correctness bug, and the user subsequently retired the `dev` branch — together these supersede the *structure* Tasks 2 and 3 produced. Task 1's output is unaffected and stands.
+
+**Task 4 is the remaining work.** It supersedes Tasks 2 and 3.
+
+| Task | Status |
+| --- | --- |
+| 1: Version source of truth + release-please config | ✅ Complete (`f3676ae`), stands unchanged |
+| 2: Replace `release.yml` | ✅ Committed (`9e8e525`), **superseded by Task 4** |
+| 3: Add `snapshot.yml` | ✅ Committed (`ba51222`), **superseded by Task 4** (file is deleted) |
+| 4: Consolidate into one workflow | ⬜ **Remaining** |
 
 ## Global Constraints
 
 - **One version for the whole repo.** Root `package.json` is the only versioned manifest. `apps/*` and `packages/email` stay unversioned and ride along.
+- **`main` only.** `dev` is retired. Feature branches come off `main` and squash-merge back.
 - **Release only — never deploy.** No SSH, no compose, no healthcheck. The pipeline ends at a tagged image in the registry.
 - **Root stays `private: true`.** release-please bumps and tags; it never publishes to npm.
-- **Image names:** `herytz/walletko`, `herytz/finance-to-walletko`. The old `herytz/finance` name is gone.
+- **Image names:** `herytz/walletko`, `herytz/finance-to-walletko`.
 - **Docker build context is the repo root** (`.`) for both images — the Dockerfiles `COPY . .` and use `pnpm --filter`.
-- **Both Dockerfiles' final stage is named `runner`.** There is no `prod` stage; the old workflow's `target: prod` would fail outright.
-- **Use `pnpm install --frozen-lockfile`** in all workflows. The old workflow used `--no-frozen-lockfile`, which defeats the lockfile in automation.
-- **Node 22** in workflows, matching `node:22-alpine` in both Dockerfiles. The old workflow pinned Node 20.
-- **No postgres service.** Both apps' tests provision their own database via `@testcontainers/postgresql` (verified: `apps/walletko/tests/integration/setup.ts`, `apps/finance-to-walletko/src/test-helpers.test.ts`).
-- **Existing secrets, reused as-is:** `DOCKER_USER`, `DOCKER_TOKEN`. The SSH secrets are no longer referenced.
-
-## Deviations from the spec
-
-Two, both deliberate. Flag to the user if either is unwelcome.
-
-1. **Config filenames.** The spec wrote `.release-please-config.json` (leading dot). This plan uses `release-please-config.json` — release-please's own default — so both file inputs can be omitted from the workflow entirely. The manifest keeps its conventional dot: `.release-please-manifest.json`.
-2. **Starting version is `0.0.0`, not `0.1.0`.** The spec said "start at 0.1.0," meaning *the first release should be 0.1.0*. release-please's manifest records the **last released** version, and bumps from it. Seeding `0.1.0` would make the first release `0.2.0`. Seeding `0.0.0` — honest, since nothing has been released — makes the first release PR propose `0.1.0`, which is the spec's intent.
-
-## File Structure
-
-| File | Status | Responsibility |
-| --- | --- | --- |
-| `package.json` | Modify | Holds the repo's single version. release-please's bump target. |
-| `release-please-config.json` | Create | How to version: release type, package name, changelog sections. |
-| `.release-please-manifest.json` | Create | The last released version. release-please's state. |
-| `.github/workflows/release.yml` | Rewrite | Release PR on `main`; publish versioned images when it merges. |
-| `.github/workflows/snapshot.yml` | Create | Push `dev` images on every push to `dev`. |
+- **Both Dockerfiles' final stage is named `runner`.** There is no `prod` stage.
+- **Use `pnpm install --frozen-lockfile`** wherever pnpm is installed.
+- **Node 22**, matching `node:22-alpine` in both Dockerfiles.
+- **No postgres service.** Both apps' tests provision their own database via `@testcontainers/postgresql` (`apps/walletko/tests/integration/setup.ts`, `apps/finance-to-walletko/src/test-helpers.test.ts`).
+- **Existing secrets, reused as-is:** `DOCKER_USER`, `DOCKER_TOKEN`.
+- **`APP_RELEASE_DATE` is UTC `YYYY-MM-DD`**; **`APP_VERSION`** is the release version, or `main-{sha}` for snapshots. `apps/walletko/src/server/functions/app-meta.fn.ts:7` reads `process.env.APP_VERSION ?? "dev"`.
 
 ---
 
-### Task 1: Version source of truth and release-please config
+### Task 4: Consolidate into one workflow
 
 **Files:**
-- Modify: `package.json:1-4` (add `version` after `name`)
-- Create: `release-please-config.json`
-- Create: `.release-please-manifest.json`
+- Rewrite: `.github/workflows/release.yml`
+- Delete: `.github/workflows/snapshot.yml`
 
 **Interfaces:**
-- Consumes: nothing.
-- Produces: the contract Task 2 depends on — release-please reads `release-please-config.json` and `.release-please-manifest.json` from the repo root, bumps `version` in `package.json`, writes `CHANGELOG.md`, and (for the root package at path `.`) exposes unprefixed action outputs `release_created`, `version`, `tag_name`.
+- Consumes: Task 1's `release-please-config.json`, `.release-please-manifest.json`, and the root `version` field. Reads the action's unprefixed outputs `release_created` and `version` (unprefixed because the package sits at path `.`).
+- Produces: `herytz/walletko:{version}` + `:latest`, `herytz/finance-to-walletko:{version}` + `:latest` on release; `herytz/walletko:main` + `:main-{sha}` on ordinary merges; tag `v{version}`, `CHANGELOG.md`, GitHub Release.
 
-- [ ] **Step 1: Add the version field to root `package.json`**
+**Why this task exists — two drivers:**
 
-Add `"version": "0.0.0"` immediately after `"name": "walletko"`. The file begins:
+1. **A correctness bug.** The committed `release.yml` runs `pnpm test` *inside* the `publish` job, which is gated on `release_created == 'true'`. That output is only true *after* release-please has already pushed the tag, written the changelog, and cut the Release. A failing test therefore cannot stop a release — it strands one: `v0.1.0` exists with no image in the registry, and `:latest` silently still points at the previous version. `test` must run **before** `release-please`, not after.
+2. **`dev` is retired.** `snapshot.yml` triggers on `push: branches: [dev]` and would silently never run again. Snapshots are load-bearing (they were chosen instead of semver prereleases), so they move to `main` and are renamed `:dev` → `:main`.
 
-```json
-{
-  "name": "walletko",
-  "version": "0.0.0",
-  "private": true,
-  "packageManager": "pnpm@10.6.1+sha512.40ee09af407fa9fbb5fbfb8e1cb40fbb74c0af0c3e10e9224d7b53c7658528615b2c92450e74cfad91e3a2dcafe3ce4050d80bda71d757756d2ce2b66213e9a3",
-```
+- [ ] **Step 1: Verify the snapshot-style build bakes in the new version string**
 
-Leave every other field untouched.
-
-- [ ] **Step 2: Create `release-please-config.json`**
-
-```json
-{
-  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
-  "packages": {
-    ".": {
-      "release-type": "node",
-      "package-name": "walletko",
-      "changelog-path": "CHANGELOG.md",
-      "include-component-in-tag": false,
-      "changelog-sections": [
-        { "type": "feat", "section": "Features" },
-        { "type": "fix", "section": "Bug Fixes" },
-        { "type": "perf", "section": "Performance" },
-        { "type": "revert", "section": "Reverts" },
-        { "type": "refactor", "section": "Refactors" },
-        { "type": "docs", "section": "Documentation", "hidden": true },
-        { "type": "chore", "section": "Chores", "hidden": true },
-        { "type": "test", "section": "Tests", "hidden": true },
-        { "type": "ci", "section": "CI", "hidden": true },
-        { "type": "build", "section": "Build", "hidden": true }
-      ]
-    }
-  }
-}
-```
-
-`include-component-in-tag: false` produces tags like `v1.4.0` rather than `walletko-v1.4.0` — correct for a single-version repo.
-
-- [ ] **Step 3: Create `.release-please-manifest.json`**
-
-```json
-{
-  ".": "0.0.0"
-}
-```
-
-This says "nothing released yet." The first release PR will therefore propose `0.1.0`, bumped by the `feat:` commits already on `main`.
-
-- [ ] **Step 4: Verify the JSON parses and the two versions agree**
-
-Run:
-
-```bash
-node -e '
-const pkg = require("./package.json");
-const manifest = require("./.release-please-manifest.json");
-const config = require("./release-please-config.json");
-if (pkg.version !== manifest["."]) throw new Error(`version mismatch: package.json ${pkg.version} vs manifest ${manifest["."]}`);
-if (!config.packages["."]) throw new Error("config missing root package");
-if (pkg.private !== true) throw new Error("root must stay private");
-console.log("ok:", pkg.version);
-'
-```
-
-Expected output: `ok: 0.0.0`
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add package.json release-please-config.json .release-please-manifest.json
-git commit -m "ci: add release-please config and repo version"
-```
-
----
-
-### Task 2: Replace the release workflow
-
-**Files:**
-- Rewrite: `.github/workflows/release.yml` (replace the file entirely — every job in it is stale)
-
-**Interfaces:**
-- Consumes: from Task 1 — `release-please-config.json`, `.release-please-manifest.json`, and the root `version` field. Reads the action's unprefixed outputs `release_created` and `version`.
-- Produces: images `herytz/walletko:{version}`, `herytz/walletko:latest`, `herytz/finance-to-walletko:{version}`, `herytz/finance-to-walletko:latest`, plus tag `v{version}`, `CHANGELOG.md`, and a GitHub Release.
-
-**Context — what the old file got wrong.** It pushed `herytz/finance`; targeted a nonexistent `prod` stage; implied a root `Dockerfile`; passed `BUILD_ID`, which nothing reads; SSH-deployed into `~/finance/app` using a `docker-compose.prod.yml` and `checkhealth.mjs` that don't exist here; ran `npx release-it` with no config; and started a postgres service the tests don't use. It is replaced, not amended.
-
-- [ ] **Step 1: Verify the walletko image builds and bakes in the version**
-
-This proves the build args the workflow will pass actually reach the image, before trusting CI to do it. Run from the repo root:
+The tag naming changed from `dev-{sha}` to `main-{sha}`, so re-verify the build arg reaches the image. Earlier builds warmed the Docker cache; only the final stage should rebuild.
 
 ```bash
 docker build \
   -f apps/walletko/Dockerfile \
   --target runner \
-  --build-arg APP_VERSION=9.9.9 \
+  --build-arg APP_VERSION=main-abc1234 \
   --build-arg APP_RELEASE_DATE=2026-07-16 \
-  -t walletko:verify .
+  -t walletko:main-verify .
+
+docker run --rm --entrypoint printenv walletko:main-verify APP_VERSION
 ```
 
-Expected: build completes. (First run is slow — it does a full `pnpm install` and `vite build`.)
+Expected output: `main-abc1234`
 
-- [ ] **Step 2: Verify `APP_VERSION` is present in the image**
-
-```bash
-docker run --rm --entrypoint printenv walletko:verify APP_VERSION
-```
-
-Expected output: `9.9.9`
-
-This is exactly the contract the release workflow owns. `apps/walletko/src/server/functions/app-meta.fn.ts:7` reads `process.env.APP_VERSION ?? "dev"` and surfaces it through the root loader onto `/about`; if the env var is in the image, the app will report it.
-
-- [ ] **Step 3: Verify the CLI image builds**
-
-```bash
-docker build \
-  -f apps/finance-to-walletko/Dockerfile \
-  --target runner \
-  -t finance-to-walletko:verify .
-```
-
-Expected: build completes. No build args — it is a CLI with nothing to display a version to. Its runner is distroless and has no shell, so there is no `printenv` check to run.
-
-- [ ] **Step 4: Replace `.github/workflows/release.yml` entirely**
+- [ ] **Step 2: Rewrite `.github/workflows/release.yml` entirely**
 
 ```yaml
 name: Release
@@ -189,34 +80,20 @@ name: Release
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
 
-jobs:
-  release-please:
-    name: Release PR
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
-    outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-      version: ${{ steps.release.outputs.version }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
-    steps:
-      - name: Release please
-        id: release
-        uses: googleapis/release-please-action@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-  publish:
-    name: Publish images
+jobs:
+  test:
+    name: Test
     runs-on: ubuntu-latest
-    needs: [release-please]
-    if: needs.release-please.outputs.release_created == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -237,6 +114,37 @@ jobs:
 
       - name: Run tests
         run: pnpm test
+
+  release-please:
+    name: Release PR
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: github.event_name == 'push'
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      version: ${{ steps.release.outputs.version }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - name: Release please
+        id: release
+        uses: googleapis/release-please-action@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    name: Publish release images
+    runs-on: ubuntu-latest
+    needs: [release-please]
+    if: github.event_name == 'push' && needs.release-please.outputs.release_created == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Resolve release date
         id: meta
@@ -275,94 +183,17 @@ jobs:
           tags: |
             herytz/finance-to-walletko:${{ needs.release-please.outputs.version }}
             herytz/finance-to-walletko:latest
-```
 
-Notes for the implementer:
-
-- `release_created` is compared against the **string** `'true'`. Action outputs are always strings; `if: needs...outputs.release_created` alone would be truthy even when the value is `"false"`.
-- The outputs are unprefixed because the package sits at path `.`. A nested package would require `.--release_created`-style names, and the publish job would silently never run.
-- No `config-file` / `manifest-file` inputs are needed — Task 1 used release-please's default filenames.
-- `pnpm test` runs `turbo test`, which spins up testcontainers. Docker is available on `ubuntu-latest`.
-
-- [ ] **Step 5: Lint the workflow**
-
-```bash
-docker run --rm -v "$(pwd):/repo" --workdir /repo rhysd/actionlint:latest -color
-```
-
-Expected: no output, exit code 0. If actionlint reports unknown-secret warnings for `DOCKER_USER` / `DOCKER_TOKEN`, those are expected — it cannot see repository secrets.
-
-- [ ] **Step 6: Commit**
-
-```bash
-git add .github/workflows/release.yml
-git commit -m "ci: replace stale release workflow with release-please"
-```
-
----
-
-### Task 3: Add the dev snapshot workflow
-
-**Files:**
-- Create: `.github/workflows/snapshot.yml`
-
-**Interfaces:**
-- Consumes: nothing from earlier tasks. Deliberately independent of the version — snapshots carry no semver.
-- Produces: images `herytz/walletko:dev` and `herytz/walletko:dev-{sha}`.
-
-**Why walletko only:** `finance-to-walletko` is a one-shot migration CLI slated for removal and has no snapshot audience. It is versioned at release time only.
-
-- [ ] **Step 1: Verify a snapshot-style build bakes in the dev version string**
-
-```bash
-docker build \
-  -f apps/walletko/Dockerfile \
-  --target runner \
-  --build-arg APP_VERSION=dev-abc1234 \
-  --build-arg APP_RELEASE_DATE=2026-07-16 \
-  -t walletko:snapshot-verify .
-
-docker run --rm --entrypoint printenv walletko:snapshot-verify APP_VERSION
-```
-
-Expected output: `dev-abc1234`
-
-- [ ] **Step 2: Create `.github/workflows/snapshot.yml`**
-
-```yaml
-name: Snapshot
-
-on:
-  push:
-    branches: [dev]
-
-permissions:
-  contents: read
-
-jobs:
   snapshot:
-    name: Publish dev image
+    name: Publish snapshot image
     runs-on: ubuntu-latest
+    needs: [release-please]
+    if: github.event_name == 'push' && needs.release-please.outputs.release_created != 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Run tests
-        run: pnpm test
 
       - name: Resolve snapshot metadata
         id: meta
@@ -387,16 +218,33 @@ jobs:
           target: runner
           push: true
           tags: |
-            herytz/walletko:dev
-            herytz/walletko:dev-${{ steps.meta.outputs.sha }}
+            herytz/walletko:main
+            herytz/walletko:main-${{ steps.meta.outputs.sha }}
           build-args: |
-            APP_VERSION=dev-${{ steps.meta.outputs.sha }}
+            APP_VERSION=main-${{ steps.meta.outputs.sha }}
             APP_RELEASE_DATE=${{ steps.meta.outputs.date }}
 ```
 
-No tag, no changelog, no version bump. `:dev` always points at the newest dev build; `:dev-{sha}` pins a specific one.
+Notes for the implementer — each of these is deliberate:
 
-- [ ] **Step 3: Lint both workflows**
+- **`test` has no `if`**, so it runs on both events and gates everything downstream. This is the whole point of the task.
+- **`publish` and `snapshot` no longer install pnpm or Node.** They only build Docker images, and the Dockerfiles run their own `pnpm install` internally. The committed version installed the toolchain to run `pnpm test`; with `test` extracted, that setup is dead weight.
+- **The explicit `github.event_name == 'push'` guard on `publish` and `snapshot` is load-bearing, not redundant.** GitHub's docs state a skipped job "reports its status as Success," and do not clearly document whether a skipped `needs` propagates the skip downstream. If it does not, then on a pull request `release-please` is skipped, `needs.release-please.outputs.release_created` is the empty string, `'' != 'true'` evaluates **true**, and `snapshot` would push a `:main` image from a PR. The event guard makes both jobs correct under either semantics. Do not "simplify" it away.
+- **`release_created` is compared against the string `'true'`.** Action outputs are always strings; a bare truthiness check passes even when the value is `"false"`.
+- **The outputs are unprefixed** (`release_created`, not `.--release_created`) because the package sits at path `.` in the manifest.
+- **`concurrency` with `cancel-in-progress` only on pull requests.** Two rapid pushes to `main` must queue, never cancel — cancelling could abort a release mid-flight. Two pushes to a PR branch should cancel the stale run. Without any concurrency group, two `main` pushes race and the slower build wins, leaving `:main` pointing at the *older* commit.
+- **No `config-file` / `manifest-file` inputs** — Task 1 used release-please's default filenames.
+- `version` has no `v` prefix (`0.1.0`); `tag_name` does (`v0.1.0`). Image tags use `version`.
+
+- [ ] **Step 3: Delete the now-superseded snapshot workflow**
+
+```bash
+git rm .github/workflows/snapshot.yml
+```
+
+Its `push: branches: [dev]` trigger is dead — `dev` is retired. Its job now lives in `release.yml` as `snapshot`.
+
+- [ ] **Step 4: Lint the workflow**
 
 ```bash
 docker run --rm -v "$(pwd):/repo" --workdir /repo rhysd/actionlint:latest -color
@@ -404,26 +252,36 @@ docker run --rm -v "$(pwd):/repo" --workdir /repo rhysd/actionlint:latest -color
 
 Expected: no output, exit code 0.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
-git add .github/workflows/snapshot.yml
-git commit -m "ci: add dev snapshot image workflow"
+git add .github/workflows/release.yml
+git commit -m "ci: consolidate release and snapshot into one gated workflow"
 ```
 
 ---
 
-## Verifying the whole thing after merge
+## Verifying after merge
 
-The workflows cannot be fully exercised locally — the release-please half only runs against a real repo. Expected sequence once this lands on `main`:
+The release-please half only runs against a real repo. Expected sequence once this lands on `main`:
 
-1. The push to `main` runs `release.yml`. The `release-please` job opens a PR titled roughly `chore(main): release 0.1.0`. `release_created` is `false`, so `publish` is **skipped**. Nothing is pushed to Docker Hub. This is correct.
-2. Merging that release PR pushes to `main` again. This time `release_created` is `true`: tag `v0.1.0` appears, `CHANGELOG.md` is written, a GitHub Release is cut, and `publish` pushes `herytz/walletko:0.1.0`, `:latest`, and the two CLI tags.
-3. Confirm end to end: `docker run --rm --entrypoint printenv herytz/walletko:0.1.0 APP_VERSION` prints `0.1.0`, and `/about` in the running app reports it instead of `dev`.
+1. **A pull request to `main`:** `test` runs. `release-please`, `publish`, and `snapshot` are all skipped. Nothing is pushed to Docker Hub.
+2. **An ordinary merge to `main`:** `test` runs, then `release-please` opens or updates a PR titled roughly `chore(main): release 0.1.0`. `release_created` is `false`, so `publish` is skipped and `snapshot` pushes `herytz/walletko:main` and `:main-{sha}`. No tag, no release.
+3. **Merging the release PR:** `test` runs, then `release_created` is `true`: tag `v0.1.0` appears, `CHANGELOG.md` is written, a GitHub Release is cut, and `publish` pushes `herytz/walletko:0.1.0`, `:latest`, and the two CLI tags. `snapshot` is skipped.
+4. **Confirm end to end:** `docker run --rm --entrypoint printenv herytz/walletko:0.1.0 APP_VERSION` prints `0.1.0`, and `/about` in the running app reports it instead of `dev`.
+
+## Required repository settings
+
+Not code; must be done before the first push to `main`.
+
+1. **Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"** must be **enabled**, or release-please's first run hard-fails with `GitHub Actions is not permitted to create or approve pull requests`.
+2. **Squash merge commit message: leave on "Default".** Do not pin it to "Pull request title" — the default is what lets commitlint cover single-commit PRs automatically.
 
 ## Known limitations
 
-- **Untested `main`.** There is still no CI workflow, so nothing tests PRs. `pnpm test` in the publish job is an interim gate that only catches breakage at release time, after the commits have landed. Addressing this is separate work.
-- **Release PRs do not trigger workflows.** release-please uses the default `GITHUB_TOKEN`, and GitHub deliberately refuses to trigger workflows from events raised by that token. Harmless today — the publish job keys off the `push` to `main` from the merge, not off the PR. It will matter when CI is added: the release PR itself will show no checks. The fix at that point is a PAT or a GitHub App token.
-- **First release scans all history.** With no existing tags, release-please considers every commit to date. With three commits, this is fine; no `bootstrap-sha` is needed.
-- **Pre-1.0 bumping uses release-please defaults.** Starting in `0.x`, a `feat:` bumps the minor (`0.1.0` → `0.2.0`) and a `feat!:`/`BREAKING CHANGE` bumps the **major**, taking you straight to `1.0.0`. If you would rather breaking changes stay inside `0.x` until you decide 1.0 has arrived, set `"bump-minor-pre-major": true` in `release-please-config.json`. Worth a deliberate choice before the first breaking change, not after.
+- **The release PR shows no checks.** release-please uses the default `GITHUB_TOKEN`, and GitHub refuses to trigger workflows from events raised by that token. So despite `pull_request` being a trigger, the release PR itself displays none. The gate still holds — merging it pushes to `main`, which runs `test` before `release-please`. Fixing the cosmetics needs a PAT or GitHub App token.
+- **Multi-commit PR titles are unguarded.** Single-commit PRs squash using their own commitlint-verified message. PRs with 2+ commits use the PR title, which nothing validates. Detected by reviewing the release PR before merging.
+- **First release scans all history.** No existing tags, so release-please considers every commit to date. Fine at this size; no `bootstrap-sha` needed.
+- **Pre-1.0 bumping uses release-please defaults.** In `0.x`, a `feat:` bumps minor and a `feat!:` bumps **major**, going straight to `1.0.0`. To keep breaking changes inside `0.x`, set `"bump-minor-pre-major": true`. Worth deciding before the first breaking change.
+- **Partial publish.** If walletko pushes and the CLI build then fails, `herytz/walletko:latest` has advanced while the CLI's has not, with no rollback. Low impact — the CLI is slated for removal.
+- **Actions are pinned to floating major tags.** The spec notes release-please's cadence is uneven; SHA-pinning would also close a supply-chain path into a workflow holding `contents: write` and Docker Hub credentials. Deferred.
