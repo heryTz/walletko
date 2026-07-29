@@ -5,7 +5,9 @@ import { decimalStringToCents } from "./amount";
 const DEFAULT_POT_NAME = "Main";
 const DEFAULT_POT_PERCENTAGE = 100;
 const DEFAULT_POT_COLOR = "#64748b";
-const MAX_WALLETKO_AMOUNT_CENTS = 2_147_483_647;
+// walletko stores amounts as bigint but maps them to JS numbers, so the real
+// ceiling is float64 integer precision rather than the column width.
+const MAX_WALLETKO_AMOUNT_CENTS = Number.MAX_SAFE_INTEGER;
 
 export type MigrationSummary = {
   users: number;

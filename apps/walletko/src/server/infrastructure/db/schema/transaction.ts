@@ -1,7 +1,7 @@
 import { createId } from "@paralleldrive/cuid2";
 import {
+  bigint,
   index,
-  integer,
   pgEnum,
   pgTable,
   primaryKey,
@@ -30,7 +30,7 @@ export const transactions = pgTable(
       .$defaultFn(() => createId()),
     type: transactionType("type").notNull(),
     name: text("name").notNull(),
-    amount: integer("amount").notNull(),
+    amount: bigint("amount", { mode: "number" }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -60,7 +60,7 @@ export const potAllocations = pgTable(
     potId: text("pot_id")
       .notNull()
       .references(() => pots.id, { onDelete: "restrict" }),
-    amount: integer("amount").notNull(),
+    amount: bigint("amount", { mode: "number" }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -90,7 +90,7 @@ export const expenseAllocations = pgTable(
     potId: text("pot_id")
       .notNull()
       .references(() => pots.id, { onDelete: "restrict" }),
-    amount: integer("amount").notNull(),
+    amount: bigint("amount", { mode: "number" }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

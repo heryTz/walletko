@@ -73,19 +73,46 @@ afterAll(async () => {
 });
 
 describe("migrate: data validation", () => {
-  it("aborts when an operation amount exceeds walletko's integer cents ceiling", async () => {
-    await insertUser("user-overflow");
+  it("migrates an MGA-scale amount above the former int32 cents ceiling", async () => {
+    await insertUser("user-mga");
     await insertOperation({
-      id: "op-overflow",
-      amount: "21474836.48",
+      id: "op-mga",
+      amount: "34000000.00",
       type: "revenue",
-      userId: "user-overflow",
+      userId: "user-mga",
     });
 
-    await expect(migrate({ financeUrl, walletkoUrl })).rejects.toThrow(
-      /exceeds walletko's maximum/,
+    await migrate({ financeUrl, walletkoUrl });
+
+    const transaction = await walletko.query<{ amount: string }>(
+      `SELECT amount::text AS amount FROM transactions WHERE id = $1`,
+      ["op-mga"],
     );
-    expect(await count(walletko, "transactions")).toBe(0);
+    expect(transaction.rows[0].amount).toBe("3400000000");
+
+    const allocated = await walletko.query<{ amount: string }>(
+      `SELECT amount::text AS amount FROM pot_allocations WHERE transaction_id = $1`,
+      ["op-mga"],
+    );
+    expect(allocated.rows[0].amount).toBe("3400000000");
+  });
+
+  it("migrates the largest amount the finance schema can hold", async () => {
+    await insertUser("user-max");
+    await insertOperation({
+      id: "op-max",
+      amount: "99999999.99",
+      type: "revenue",
+      userId: "user-max",
+    });
+
+    await migrate({ financeUrl, walletkoUrl });
+
+    const transaction = await walletko.query<{ amount: string }>(
+      `SELECT amount::text AS amount FROM transactions WHERE id = $1`,
+      ["op-max"],
+    );
+    expect(transaction.rows[0].amount).toBe("9999999999");
   });
 
   it("aborts on an unexpected operation type", async () => {
