@@ -44,7 +44,7 @@ function AboutPage() {
       </div>
 
       <div className="divide-y divide-border rounded-xl border border-border px-4">
-        <MetaRow label="Version" value={`v${version}`} />
+        <MetaRow label="Version" value={version} />
         {releaseDate && (
           <MetaRow label="Released" value={formatReleaseDate(releaseDate)} />
         )}
