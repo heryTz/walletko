@@ -3,6 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { authMiddleware } from "src/server/auth/middleware";
 import { db } from "src/server/infrastructure/db/client";
 import { DrizzleListTransactionsQuery } from "src/server/infrastructure/transaction/drizzle-list-transactions.query";
+import { DrizzleSearchNameSuggestionsQuery } from "src/server/infrastructure/transaction/drizzle-search-name-suggestions.query";
 import { z } from "zod";
 
 const PAGE_SIZE = 20;
@@ -43,4 +44,20 @@ export const listTransactionsFn = createServerFn({ method: "GET" })
       total,
       totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
     };
+  });
+
+const searchNameSuggestionsSchema = z.object({
+  type: z.enum(["income", "expense"]),
+  search: z.string().trim().max(100).default(""),
+});
+
+export const searchNameSuggestionsFn = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .validator(searchNameSuggestionsSchema)
+  .handler(async ({ data, context }) => {
+    const query = new DrizzleSearchNameSuggestionsQuery(db);
+    return query.execute(context.session.user.id, {
+      type: data.type,
+      search: data.search,
+    });
   });

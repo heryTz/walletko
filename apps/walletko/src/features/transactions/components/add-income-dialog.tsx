@@ -3,6 +3,7 @@ import { useEffect, useId } from "react";
 import { dashboardKeys } from "src/features/dashboard/queries";
 import { potsQuery, totalBalanceQuery } from "src/features/pots/queries";
 import { tagKeys, tagsQuery } from "src/features/tags/queries";
+import { useNameSuggestions } from "src/features/transactions/hooks/use-name-suggestions";
 import { transactionKeys } from "src/features/transactions/queries";
 import { receiveIncomeFn } from "src/server/functions/income.fn";
 import { useAppForm } from "src/shared/form/form-setup";
@@ -38,6 +39,12 @@ export function AddIncomeDialog({ open, onOpenChange }: AddIncomeDialogProps) {
   const formId = useId();
   const qc = useQueryClient();
   const { data: tagSuggestions = [] } = useQuery(tagsQuery);
+  const {
+    options: nameOptions,
+    isFetching: isFetchingNames,
+    setSearch: setNameSearch,
+    tagsFor,
+  } = useNameSuggestions("income", { enabled: open });
 
   const tagOptions = tagSuggestions.map((s) => ({
     value: s.id,
@@ -85,6 +92,7 @@ export function AddIncomeDialog({ open, onOpenChange }: AddIncomeDialogProps) {
     if (open) {
       f.reset();
       mutation.reset();
+      setNameSearch("");
     }
   }, [open]);
 
@@ -105,9 +113,17 @@ export function AddIncomeDialog({ open, onOpenChange }: AddIncomeDialogProps) {
           <div className="space-y-4 pt-2">
             <f.AppField name="name">
               {(field) => (
-                <field.InputField
+                <field.AutocompleteField
                   label="Name"
                   placeholder="e.g. April Salary"
+                  options={nameOptions}
+                  isFetching={isFetchingNames}
+                  onSearchChange={setNameSearch}
+                  onSelect={(name) => {
+                    if (f.getFieldValue("tags").length === 0) {
+                      f.setFieldValue("tags", tagsFor(name));
+                    }
+                  }}
                 />
               )}
             </f.AppField>

@@ -18,7 +18,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:build-migrate": "esbuild src/server/infrastructure/db/migrate.ts --bundle --platform=node --target=node22 --format=esm --outfile=dist/migrate.mjs --external:pg-native --banner:js=\"import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);\"",
     "db:studio": "drizzle-kit studio",
-    "depcruise": "depcruise src --config .dependency-cruiser.cjs"
+    "depcruise": "depcruise \"src/**/*.{ts,tsx}\" --config .dependency-cruiser.cjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { dashboardKeys } from "src/features/dashboard/queries";
 import { tagKeys, tagsQuery } from "src/features/tags/queries";
+import { useNameSuggestions } from "src/features/transactions/hooks/use-name-suggestions";
 import {
   incomeQuery,
   transactionKeys,
@@ -54,6 +55,12 @@ function EditIncomeForm({ data, onClose }: EditIncomeFormProps) {
     value: s.id,
     label: s.name,
   }));
+  const {
+    options: nameOptions,
+    isFetching: isFetchingNames,
+    setSearch: setNameSearch,
+    tagsFor,
+  } = useNameSuggestions("income");
 
   const mutation = useMutation({
     mutationFn: updateIncomeFn,
@@ -106,7 +113,18 @@ function EditIncomeForm({ data, onClose }: EditIncomeFormProps) {
         </p>
         <f.AppField name="name">
           {(field) => (
-            <field.InputField label="Name" placeholder="e.g. April Salary" />
+            <field.AutocompleteField
+              label="Name"
+              placeholder="e.g. April Salary"
+              options={nameOptions}
+              isFetching={isFetchingNames}
+              onSearchChange={setNameSearch}
+              onSelect={(name) => {
+                if (f.getFieldValue("tags").length === 0) {
+                  f.setFieldValue("tags", tagsFor(name));
+                }
+              }}
+            />
           )}
         </f.AppField>
         <f.AppField name="date">

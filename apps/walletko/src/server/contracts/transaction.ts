@@ -13,3 +13,10 @@ export type TransactionDTO = {
   createdAt: Date;
   tags: { id: string; name: string }[];
 };
+
+export type SuggestibleTransactionType = "income" | "expense";
+
+export type NameSuggestionDTO = {
+  name: string;
+  tags: { id: string; name: string }[];
+};

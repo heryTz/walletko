@@ -5,6 +5,7 @@ import { dashboardKeys } from "src/features/dashboard/queries";
 import { PotPicker } from "src/features/pots/components/pot-picker";
 import { potsQuery, totalBalanceQuery } from "src/features/pots/queries";
 import { tagKeys, tagsQuery } from "src/features/tags/queries";
+import { useNameSuggestions } from "src/features/transactions/hooks/use-name-suggestions";
 import { transactionKeys } from "src/features/transactions/queries";
 import type { PotWithBalanceDTO } from "src/server/contracts/pot";
 import { payExpenseFn } from "src/server/functions/expense.fn";
@@ -68,6 +69,12 @@ export function AddExpenseDialog({
   const { data: tagSuggestions = [] } = useQuery(tagsQuery);
   const { data: pots = [] } = useQuery(potsQuery);
   const formatError = useFormatError();
+  const {
+    options: nameOptions,
+    isFetching: isFetchingNames,
+    setSearch: setNameSearch,
+    tagsFor,
+  } = useNameSuggestions("expense", { enabled: open });
 
   const tagOptions = tagSuggestions.map((s) => ({
     value: s.id,
@@ -118,6 +125,7 @@ export function AddExpenseDialog({
     if (open) {
       f.reset();
       mutation.reset();
+      setNameSearch("");
     }
   }, [open]);
 
@@ -138,7 +146,18 @@ export function AddExpenseDialog({
           <div className="space-y-4 pt-2">
             <f.AppField name="name">
               {(field) => (
-                <field.InputField label="Name" placeholder="e.g. Groceries" />
+                <field.AutocompleteField
+                  label="Name"
+                  placeholder="e.g. Groceries"
+                  options={nameOptions}
+                  isFetching={isFetchingNames}
+                  onSearchChange={setNameSearch}
+                  onSelect={(name) => {
+                    if (f.getFieldValue("tags").length === 0) {
+                      f.setFieldValue("tags", tagsFor(name));
+                    }
+                  }}
+                />
               )}
             </f.AppField>
             <f.AppField name="date">

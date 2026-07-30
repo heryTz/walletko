@@ -1,5 +1,8 @@
-import { queryOptions } from "@tanstack/react-query";
-import type { TransactionDTO } from "src/server/contracts/transaction";
+import { keepPreviousData, queryOptions } from "@tanstack/react-query";
+import type {
+  SuggestibleTransactionType,
+  TransactionDTO,
+} from "src/server/contracts/transaction";
 import {
   getExpenseCancelPreviewFn,
   getExpenseFn,
@@ -8,7 +11,10 @@ import {
   getIncomeCancelPreviewFn,
   getIncomeFn,
 } from "src/server/functions/income.fn";
-import { listTransactionsFn } from "src/server/functions/transactions.fn";
+import {
+  listTransactionsFn,
+  searchNameSuggestionsFn,
+} from "src/server/functions/transactions.fn";
 
 type TransactionTypeValue = TransactionDTO["type"];
 
@@ -29,6 +35,8 @@ export const transactionKeys = {
     [...transactionKeys.all, "expense-cancel-preview", id] as const,
   incomeCancelPreview: (id: string) =>
     [...transactionKeys.all, "income-cancel-preview", id] as const,
+  nameSuggestions: (type: SuggestibleTransactionType, search: string) =>
+    [...transactionKeys.all, "name-suggestions", type, search] as const,
 };
 
 export const transactionsQuery = (filters: TransactionFilters) =>
@@ -65,4 +73,16 @@ export const incomeCancelPreviewQuery = (id: string) =>
   queryOptions({
     queryKey: transactionKeys.incomeCancelPreview(id),
     queryFn: () => getIncomeCancelPreviewFn({ data: { id } }),
+  });
+
+export const nameSuggestionsQuery = (
+  type: SuggestibleTransactionType,
+  search: string,
+) =>
+  queryOptions({
+    queryKey: transactionKeys.nameSuggestions(type, search),
+    queryFn: () => searchNameSuggestionsFn({ data: { type, search } }),
+    placeholderData: keepPreviousData,
+    staleTime: 30_000,
+    retry: false,
   });

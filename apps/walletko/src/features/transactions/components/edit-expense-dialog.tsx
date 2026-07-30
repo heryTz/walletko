@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { dashboardKeys } from "src/features/dashboard/queries";
 import { tagKeys, tagsQuery } from "src/features/tags/queries";
+import { useNameSuggestions } from "src/features/transactions/hooks/use-name-suggestions";
 import {
   expenseQuery,
   transactionKeys,
@@ -55,6 +56,12 @@ function EditExpenseForm({ data, onClose }: EditExpenseFormProps) {
     value: s.id,
     label: s.name,
   }));
+  const {
+    options: nameOptions,
+    isFetching: isFetchingNames,
+    setSearch: setNameSearch,
+    tagsFor,
+  } = useNameSuggestions("expense");
 
   const mutation = useMutation({
     mutationFn: updateExpenseFn,
@@ -107,9 +114,17 @@ function EditExpenseForm({ data, onClose }: EditExpenseFormProps) {
         </p>
         <f.AppField name="name">
           {(field) => (
-            <field.InputField
+            <field.AutocompleteField
               label="Name"
               placeholder="e.g. Grocery Shopping"
+              options={nameOptions}
+              isFetching={isFetchingNames}
+              onSearchChange={setNameSearch}
+              onSelect={(name) => {
+                if (f.getFieldValue("tags").length === 0) {
+                  f.setFieldValue("tags", tagsFor(name));
+                }
+              }}
             />
           )}
         </f.AppField>

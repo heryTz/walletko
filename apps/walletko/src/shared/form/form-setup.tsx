@@ -1,6 +1,7 @@
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { AllocationField } from "./allocation-field";
 import { AmountField } from "./amount-field";
+import { AutocompleteField } from "./autocomplete-field";
 import { ColorField } from "./color-field";
 import { ComboboxField } from "./combobox-field";
 import { DatePickerField } from "./date-picker-field";
@@ -14,6 +15,7 @@ const { fieldContext, formContext, useFieldContext, useFormContext } =
 const { useAppForm } = createFormHook({
   fieldComponents: {
     InputField,
+    AutocompleteField,
     OtpField,
     AmountField,
     DatePickerField,
