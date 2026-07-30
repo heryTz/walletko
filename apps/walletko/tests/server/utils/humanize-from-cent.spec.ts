@@ -21,4 +21,14 @@ describe("humanizeFromCent", () => {
   it("handles zero", () => {
     expect(humanizeFromCent(0)).toBe("0 Ar");
   });
+
+  it("applies the same suffixes to negative values", () => {
+    expect(humanizeFromCent(-4_500_000)).toBe("-45K Ar");
+    expect(humanizeFromCent(-124_000_000)).toBe("-1.24M Ar");
+    expect(humanizeFromCent(-200_000_000)).toBe("-2M Ar");
+  });
+
+  it("formats negative values under 1 000 Ar as plain", () => {
+    expect(humanizeFromCent(-50_000)).toBe("-500 Ar");
+  });
 });

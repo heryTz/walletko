@@ -11,11 +11,13 @@ function stripTrailingZeros(s: string): string {
 
 export function humanizeFromCent(cents: number): string {
   const mga = cents / 100;
-  if (mga >= 1_000_000) {
-    return `${stripTrailingZeros((mga / 1_000_000).toFixed(2))}M Ar`;
+  const magnitude = Math.abs(mga);
+  const sign = mga < 0 ? "-" : "";
+  if (magnitude >= 1_000_000) {
+    return `${sign}${stripTrailingZeros((magnitude / 1_000_000).toFixed(2))}M Ar`;
   }
-  if (mga >= 1_000) {
-    return `${stripTrailingZeros((mga / 1_000).toFixed(2))}K Ar`;
+  if (magnitude >= 1_000) {
+    return `${sign}${stripTrailingZeros((magnitude / 1_000).toFixed(2))}K Ar`;
   }
   return `${mga} Ar`;
 }
