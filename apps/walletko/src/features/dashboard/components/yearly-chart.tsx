@@ -12,7 +12,10 @@ import {
   YAxis,
 } from "recharts";
 import type { MonthStatDTO } from "src/server/contracts/dashboard";
-import { useFormatCurrency } from "src/shared/hooks/use-format-currency";
+import {
+  humanizeFromCent,
+  useFormatCurrency,
+} from "src/shared/hooks/use-format-currency";
 import { Card, CardContent } from "src/shared/ui/card";
 import { Select } from "src/shared/ui/select";
 
@@ -76,6 +79,35 @@ type YearlyChartProps = {
   onYearChange: (year: number) => void;
 };
 
+type MoneyAxisTickProps = {
+  formatExact: (cents: number) => string;
+  x?: number;
+  y?: number;
+  payload?: { value: number };
+};
+
+function MoneyAxisTick({
+  formatExact,
+  x = 0,
+  y = 0,
+  payload,
+}: MoneyAxisTickProps) {
+  const value = payload?.value ?? 0;
+  return (
+    <text
+      x={x}
+      y={y}
+      dy="0.355em"
+      textAnchor="end"
+      fontSize={13}
+      className="fill-muted-foreground"
+    >
+      <title>{formatExact(value)}</title>
+      {humanizeFromCent(value)}
+    </text>
+  );
+}
+
 export function YearlyChart({
   data,
   year,
@@ -122,8 +154,7 @@ export function YearlyChart({
               className="text-muted-foreground"
             />
             <YAxis
-              tickFormatter={(v: number) => formatFromCent(v)}
-              tick={{ fontSize: 13 }}
+              tick={<MoneyAxisTick formatExact={formatFromCent} />}
               className="text-muted-foreground"
               width={80}
             />

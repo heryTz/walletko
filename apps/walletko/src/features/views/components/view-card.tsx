@@ -3,7 +3,6 @@ import { Link } from "@tanstack/react-router";
 import { ChevronRightIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { viewStatsQuery } from "src/features/views/queries";
 import type { SavedViewListItem } from "src/server/contracts/saved-view";
-import { useFormatCurrency } from "src/shared/hooks/use-format-currency";
 import { Badge } from "src/shared/ui/badge";
 import {
   Card,
@@ -18,10 +17,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "src/shared/ui/dropdown-menu";
+import { Money } from "src/shared/ui/money";
 import { RowActions } from "src/shared/ui/row-actions";
 
 function ViewStatsPreview({ viewId }: { viewId: string }) {
-  const { formatFromCent } = useFormatCurrency();
   const { data: stats } = useQuery(viewStatsQuery(viewId));
   if (!stats) return <span className="text-muted-foreground text-sm">—</span>;
   const isPositive = stats.netBalance >= 0;
@@ -33,7 +32,7 @@ function ViewStatsPreview({ viewId }: { viewId: string }) {
           : "text-destructive font-semibold text-sm"
       }
     >
-      {formatFromCent(stats.netBalance)}
+      <Money value={stats.netBalance} />
     </span>
   );
 }

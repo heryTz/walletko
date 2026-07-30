@@ -9,16 +9,15 @@ import type { PotListItem } from "src/features/pots/components/pot-row";
 import { PotRow } from "src/features/pots/components/pot-row";
 import { TransferPotDialog } from "src/features/pots/components/transfer-pot-dialog";
 import { potsQuery, totalBalanceQuery } from "src/features/pots/queries";
-import { useFormatCurrency } from "src/shared/hooks/use-format-currency";
 import { PageContent, PageHeader } from "src/shared/layout/page";
 import { DataList, DataListHead } from "src/shared/ui/data-list";
 import { EmptyState } from "src/shared/ui/empty-state";
+import { Money } from "src/shared/ui/money";
 import { PageActions } from "src/shared/ui/page-actions";
 
 export function PotsPage() {
   const { data: pots } = useSuspenseQuery(potsQuery);
   const { data: balanceData } = useSuspenseQuery(totalBalanceQuery);
-  const { formatFromCent } = useFormatCurrency();
   const [addOpen, setAddOpen] = useState(false);
   const [allocationOpen, setAllocationOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
@@ -36,9 +35,7 @@ export function PotsPage() {
     <PageContent>
       <PageHeader
         eyebrow="Total Balance"
-        title={
-          <span className="tabular-nums">{formatFromCent(totalBalance)}</span>
-        }
+        title={<Money value={totalBalance} />}
         action={
           <PageActions
             primary={{

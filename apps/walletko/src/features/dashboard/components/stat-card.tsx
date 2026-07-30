@@ -1,12 +1,11 @@
 import { cn } from "src/shared/lib/utils";
 import { Card, CardContent } from "src/shared/ui/card";
-import { Tooltip, TooltipContent, TooltipTrigger } from "src/shared/ui/tooltip";
+import { Money } from "src/shared/ui/money";
 
 type StatCardProps = {
   label: string;
-  value: string;
+  value: number;
   human?: boolean;
-  exactValue?: string;
   variant?: "default" | "income" | "expense";
   className?: string;
 };
@@ -21,33 +20,23 @@ export function StatCard({
   label,
   value,
   human,
-  exactValue,
   variant = "default",
   className,
 }: StatCardProps) {
-  const valueClassName = cn(
-    "text-2xl font-bold tabular-nums tracking-tight",
-    valueVariants[variant],
-  );
-
   return (
     <Card className={className}>
       <CardContent className="pt-3 pb-3 space-y-1">
         <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-widest">
           {label}
         </p>
-        {human && exactValue ? (
-          <Tooltip>
-            <TooltipTrigger
-              render={<p className={cn(valueClassName, "cursor-default")} />}
-            >
-              {value}
-            </TooltipTrigger>
-            <TooltipContent>{exactValue}</TooltipContent>
-          </Tooltip>
-        ) : (
-          <p className={valueClassName}>{value}</p>
-        )}
+        <p
+          className={cn(
+            "text-2xl font-bold tracking-tight",
+            valueVariants[variant],
+          )}
+        >
+          <Money value={value} human={human} />
+        </p>
       </CardContent>
     </Card>
   );

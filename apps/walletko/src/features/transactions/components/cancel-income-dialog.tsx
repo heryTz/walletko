@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "src/shared/ui/dialog";
+import { Money } from "src/shared/ui/money";
 import { Spinner } from "src/shared/ui/spinner";
 
 type PreviewLine = {
@@ -107,9 +108,9 @@ export function CancelIncomeDialog({
                   <span>{line.potName}</span>
                   <span className="flex items-center gap-2 shrink-0 tabular-nums">
                     <span className="font-medium text-destructive">
-                      −{formatFromCent(line.amount)}
+                      −<Money value={line.amount} />
                     </span>
-                    {resultText(line, formatFromCent)}
+                    {resultText(line)}
                   </span>
                 </li>
               ))}
@@ -159,10 +160,7 @@ export function CancelIncomeDialog({
   );
 }
 
-const resultText = (
-  line: PreviewLine,
-  formatFromCent: (cents: number) => string,
-) => {
+const resultText = (line: PreviewLine) => {
   if (line.status === "pot_archived") {
     return (
       <span className="text-destructive">pot archived — can’t reclaim ⚠</span>
@@ -171,7 +169,7 @@ const resultText = (
   const negative = line.status === "shortfall";
   return (
     <span className={negative ? "text-destructive" : "text-muted-foreground"}>
-      → {formatFromCent(line.resultingBalance ?? 0)}
+      → <Money value={line.resultingBalance ?? 0} />
       {negative ? " ⚠" : " left"}
     </span>
   );

@@ -9,7 +9,6 @@ import { transactionKeys } from "src/features/transactions/queries";
 import type { PotWithBalanceDTO } from "src/server/contracts/pot";
 import { payExpenseFn } from "src/server/functions/expense.fn";
 import { useAppForm } from "src/shared/form/form-setup";
-import { useFormatCurrency } from "src/shared/hooks/use-format-currency";
 import { useFormatError } from "src/shared/lib/use-format-error";
 import { Alert, AlertDescription } from "src/shared/ui/alert";
 import { Button } from "src/shared/ui/button";
@@ -22,6 +21,7 @@ import {
   DialogTitle,
 } from "src/shared/ui/dialog";
 import { FormField } from "src/shared/ui/form-field";
+import { Money } from "src/shared/ui/money";
 import { z } from "zod";
 
 type DrawFromEntry = {
@@ -67,7 +67,6 @@ export function AddExpenseDialog({
   const qc = useQueryClient();
   const { data: tagSuggestions = [] } = useQuery(tagsQuery);
   const { data: pots = [] } = useQuery(potsQuery);
-  const { formatFromCent } = useFormatCurrency();
   const formatError = useFormatError();
 
   const tagOptions = tagSuggestions.map((s) => ({
@@ -182,7 +181,7 @@ export function AddExpenseDialog({
                               {entry.potName}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {formatFromCent(entry.balance)} available
+                              <Money value={entry.balance} /> available
                             </p>
                           </div>
                           <f.AppField name={`drawFrom[${i}].amount`}>
@@ -217,7 +216,7 @@ export function AddExpenseDialog({
 
                       {entries.length > 0 && (
                         <p className="text-sm tabular-nums text-right text-muted-foreground">
-                          Total: {formatFromCent(Math.round(total * 100))}
+                          Total: <Money value={Math.round(total * 100)} />
                         </p>
                       )}
                     </div>

@@ -6,7 +6,6 @@ import {
   transactionKeys,
 } from "src/features/transactions/queries";
 import { cancelExpenseFn } from "src/server/functions/expense.fn";
-import { useFormatCurrency } from "src/shared/hooks/use-format-currency";
 import { Alert, AlertDescription } from "src/shared/ui/alert";
 import { Button } from "src/shared/ui/button";
 import {
@@ -17,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "src/shared/ui/dialog";
+import { Money } from "src/shared/ui/money";
 import { Spinner } from "src/shared/ui/spinner";
 
 type CancelExpenseDialogProps = {
@@ -29,7 +29,6 @@ export function CancelExpenseDialog({
   onOpenChange,
 }: CancelExpenseDialogProps) {
   const qc = useQueryClient();
-  const { formatFromCent } = useFormatCurrency();
 
   const {
     data: preview,
@@ -95,11 +94,11 @@ export function CancelExpenseDialog({
                   </span>
                   <span className="flex shrink-0 items-center gap-2 tabular-nums">
                     <span className="font-medium text-income">
-                      +{formatFromCent(line.amount)}
+                      +<Money value={line.amount} />
                     </span>
                     {!line.redirected && line.resultingBalance !== null && (
                       <span className="text-muted-foreground">
-                        → {formatFromCent(line.resultingBalance)}
+                        → <Money value={line.resultingBalance} />
                       </span>
                     )}
                   </span>
@@ -108,7 +107,7 @@ export function CancelExpenseDialog({
             </ul>
             {preview.redirectTotal > 0 && (
               <p className="text-xs text-muted-foreground">
-                {formatFromCent(preview.redirectTotal)} from archived pots will
+                <Money value={preview.redirectTotal} /> from archived pots will
                 be returned to {preview.defaultPotName}.
               </p>
             )}

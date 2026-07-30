@@ -1,5 +1,5 @@
-import { useFormatCurrency } from "src/shared/hooks/use-format-currency";
 import { Card, CardContent } from "src/shared/ui/card";
+import { Money } from "src/shared/ui/money";
 import {
   Progress,
   ProgressIndicator,
@@ -19,8 +19,6 @@ export function PotStatCard({
   color,
   percentage,
 }: PotStatCardProps) {
-  const { formatFromCent } = useFormatCurrency();
-
   return (
     <Card>
       <CardContent className="pt-3 pb-3 space-y-2">
@@ -34,8 +32,8 @@ export function PotStatCard({
             {percentage}%
           </span>
         </div>
-        <p className="text-lg font-bold tabular-nums">
-          {formatFromCent(balance)}
+        <p className="text-lg font-bold">
+          <Money value={balance} />
         </p>
         <Progress value={percentage}>
           <ProgressTrack>

@@ -4,7 +4,6 @@ import { potsQuery, totalBalanceQuery } from "src/features/pots/queries";
 import { archivePotFn } from "src/server/functions/pots.fn";
 import type { ModalAllocation } from "src/shared/components/allocation-disc";
 import { useAppForm } from "src/shared/form/form-setup";
-import { useFormatCurrency } from "src/shared/hooks/use-format-currency";
 import { Alert, AlertDescription } from "src/shared/ui/alert";
 import { Button } from "src/shared/ui/button";
 import {
@@ -16,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "src/shared/ui/dialog";
+import { Money } from "src/shared/ui/money";
 import { Select } from "src/shared/ui/select";
 import { z } from "zod";
 
@@ -50,7 +50,6 @@ const archivePotFormSchema = z
 export function ArchivePotDialog({ open, onClose, pot, remainingPots }: Props) {
   const formId = useId();
   const qc = useQueryClient();
-  const { formatFromCent } = useFormatCurrency();
 
   const needsTransfer = pot.balance > 0;
   const steps = useMemo(
@@ -140,7 +139,7 @@ export function ArchivePotDialog({ open, onClose, pot, remainingPots }: Props) {
               <div className="space-y-3">
                 <Alert>
                   <AlertDescription>
-                    {pot.name} still holds {formatFromCent(pot.balance)}. Choose
+                    {pot.name} still holds <Money value={pot.balance} />. Choose
                     where to move it before archiving.
                   </AlertDescription>
                 </Alert>

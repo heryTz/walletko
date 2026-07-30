@@ -7,7 +7,6 @@ import {
 } from "src/features/transactions/queries";
 import { updateExpenseFn } from "src/server/functions/expense.fn";
 import { useAppForm } from "src/shared/form/form-setup";
-import { useFormatCurrency } from "src/shared/hooks/use-format-currency";
 import { Alert, AlertDescription } from "src/shared/ui/alert";
 import { Button } from "src/shared/ui/button";
 import {
@@ -18,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "src/shared/ui/dialog";
+import { Money } from "src/shared/ui/money";
 import { Spinner } from "src/shared/ui/spinner";
 import { z } from "zod";
 
@@ -50,7 +50,6 @@ type EditExpenseFormProps = {
 
 function EditExpenseForm({ data, onClose }: EditExpenseFormProps) {
   const qc = useQueryClient();
-  const { formatFromCent } = useFormatCurrency();
   const { data: tagSuggestions = [] } = useQuery(tagsQuery);
   const tagOptions = tagSuggestions.map((s) => ({
     value: s.id,
@@ -103,7 +102,7 @@ function EditExpenseForm({ data, onClose }: EditExpenseFormProps) {
         <p className="text-sm text-muted-foreground">
           Amount:{" "}
           <span className="font-medium text-foreground">
-            {formatFromCent(data.amount)}
+            <Money value={data.amount} />
           </span>
         </p>
         <f.AppField name="name">

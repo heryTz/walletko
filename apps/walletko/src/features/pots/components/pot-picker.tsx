@@ -1,7 +1,6 @@
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import type { PotWithBalanceDTO } from "src/server/contracts/pot";
-import { useFormatCurrency } from "src/shared/hooks/use-format-currency";
 import { Button } from "src/shared/ui/button";
 import {
   Command,
@@ -9,6 +8,7 @@ import {
   CommandItem,
   CommandList,
 } from "src/shared/ui/command";
+import { Money } from "src/shared/ui/money";
 import { Popover, PopoverContent, PopoverTrigger } from "src/shared/ui/popover";
 
 type PotPickerProps = {
@@ -18,7 +18,6 @@ type PotPickerProps = {
 
 export function PotPicker({ options, onSelect }: PotPickerProps) {
   const [open, setOpen] = useState(false);
-  const { formatFromCent } = useFormatCurrency();
 
   if (options.length === 0) return null;
 
@@ -46,9 +45,10 @@ export function PotPicker({ options, onSelect }: PotPickerProps) {
                   className="cursor-pointer"
                 >
                   <span className="flex-1 truncate">{pot.name}</span>
-                  <span className="text-xs text-muted-foreground ml-2 tabular-nums">
-                    {formatFromCent(pot.balance)}
-                  </span>
+                  <Money
+                    value={pot.balance}
+                    className="text-xs text-muted-foreground ml-2"
+                  />
                 </CommandItem>
               ))}
             </CommandGroup>

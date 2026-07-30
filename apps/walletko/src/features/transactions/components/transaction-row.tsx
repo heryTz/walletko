@@ -6,13 +6,13 @@ import {
   Trash2,
 } from "lucide-react";
 import type { TransactionDTO } from "src/server/contracts/transaction";
-import { useFormatCurrency } from "src/shared/hooks/use-format-currency";
 import { useFormatDate } from "src/shared/hooks/use-format-date";
 import { cn } from "src/shared/lib/utils";
 import { Badge } from "src/shared/ui/badge";
 import { DataListRow } from "src/shared/ui/data-list";
 import { DropdownMenuItem } from "src/shared/ui/dropdown-menu";
 import { HighlightMatch } from "src/shared/ui/highlight-match";
+import { Money } from "src/shared/ui/money";
 import { RowActions } from "src/shared/ui/row-actions";
 
 export function TransactionRow({
@@ -26,7 +26,6 @@ export function TransactionRow({
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
 }) {
-  const { formatFromCent } = useFormatCurrency();
   const formatDate = useFormatDate();
   return (
     <DataListRow>
@@ -102,7 +101,7 @@ export function TransactionRow({
         {tx.type === "expense" && "−"}
         {tx.type === "income_cancellation" && "↺ "}
         {tx.type === "expense_cancellation" && "↺ "}
-        {formatFromCent(tx.amount)}
+        <Money value={tx.amount} />
       </p>
 
       {tx.type === "income" || tx.type === "expense" ? (

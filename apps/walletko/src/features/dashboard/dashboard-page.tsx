@@ -16,10 +16,6 @@ import {
 import { AddExpenseDialog } from "src/features/transactions/components/add-expense-dialog";
 import { AddIncomeDialog } from "src/features/transactions/components/add-income-dialog";
 import {
-  humanizeFromCent,
-  useFormatCurrency,
-} from "src/shared/hooks/use-format-currency";
-import {
   STAT_KEYS,
   useStatVisibility,
 } from "src/shared/hooks/use-stat-visibility";
@@ -36,7 +32,6 @@ import { Switch } from "src/shared/ui/switch";
 const user = { name: "Hery Nirintsoa" };
 
 export function DashboardPage() {
-  const { formatFromCent } = useFormatCurrency();
   const { visible, toggle, labels } = useStatVisibility();
   const [addIncomeOpen, setAddIncomeOpen] = useState(false);
   const [addExpenseOpen, setAddExpenseOpen] = useState(false);
@@ -116,44 +111,46 @@ export function DashboardPage() {
           </Popover>
         }
       >
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
           {visible.has("totalBalance") && (
             <StatCard
               label="Total Balance"
-              value={formatFromCent(overview.totalBalance)}
-              className="col-span-2"
+              value={overview.totalBalance}
+              className="md:col-span-2"
             />
           )}
           {visible.has("monthIncome") && (
             <StatCard
               label="Income this month"
-              value={formatFromCent(overview.monthIncome)}
+              value={overview.monthIncome}
               variant="income"
+              className="lg:col-span-2"
             />
           )}
           {visible.has("monthExpense") && (
             <StatCard
               label="Expenses this month"
-              value={formatFromCent(overview.monthExpense)}
+              value={overview.monthExpense}
               variant="expense"
+              className="lg:col-span-2"
             />
           )}
           {visible.has("allTimeIncome") && (
             <StatCard
               label="All Time Income"
-              value={humanizeFromCent(overview.allTimeIncome)}
-              exactValue={formatFromCent(overview.allTimeIncome)}
+              value={overview.allTimeIncome}
               human
               variant="income"
+              className="lg:col-span-2"
             />
           )}
           {visible.has("allTimeExpense") && (
             <StatCard
               label="All Time Expense"
-              value={humanizeFromCent(overview.allTimeExpense)}
-              exactValue={formatFromCent(overview.allTimeExpense)}
+              value={overview.allTimeExpense}
               human
               variant="expense"
+              className="lg:col-span-2"
             />
           )}
         </div>

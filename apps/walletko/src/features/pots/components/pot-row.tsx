@@ -1,8 +1,8 @@
 import { ArchiveIcon, PencilIcon } from "lucide-react";
-import { useFormatCurrency } from "src/shared/hooks/use-format-currency";
 import { useFormatDate } from "src/shared/hooks/use-format-date";
 import { DataListRow } from "src/shared/ui/data-list";
 import { DropdownMenuItem } from "src/shared/ui/dropdown-menu";
+import { Money } from "src/shared/ui/money";
 import { RowActions } from "src/shared/ui/row-actions";
 
 export type PotListItem = {
@@ -22,7 +22,6 @@ type PotRowProps = {
 };
 
 export function PotRow({ pot, onEdit, onArchive }: PotRowProps) {
-  const { formatFromCent } = useFormatCurrency();
   const formatDate = useFormatDate();
 
   return (
@@ -40,9 +39,10 @@ export function PotRow({ pot, onEdit, onArchive }: PotRowProps) {
       <span className="w-12 text-right text-sm text-muted-foreground tabular-nums">
         {pot.percentage}%
       </span>
-      <span className="w-24 text-right text-sm font-medium tabular-nums">
-        {formatFromCent(pot.balance)}
-      </span>
+      <Money
+        value={pot.balance}
+        className="w-24 text-right text-sm font-medium"
+      />
       <RowActions label={`Actions for ${pot.name}`}>
         <DropdownMenuItem
           className="cursor-pointer gap-2"

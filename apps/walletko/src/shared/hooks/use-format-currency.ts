@@ -1,7 +1,8 @@
 const formatter = new Intl.NumberFormat("fr-MG", {
   style: "currency",
   currency: "MGA",
-  maximumFractionDigits: 0,
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
 });
 
 function stripTrailingZeros(s: string): string {
@@ -19,8 +20,14 @@ export function humanizeFromCent(cents: number): string {
   return `${mga} Ar`;
 }
 
+const NARROW_NO_BREAK_SPACE = / /g;
+const NO_BREAK_SPACE = " ";
+
 export function useFormatCurrency() {
   return {
-    formatFromCent: (cents: number) => formatter.format(cents / 100),
+    formatFromCent: (cents: number) =>
+      formatter
+        .format(cents / 100)
+        .replace(NARROW_NO_BREAK_SPACE, NO_BREAK_SPACE),
   };
 }

@@ -10,7 +10,6 @@ import { potsQuery } from "src/features/pots/queries";
 import type { PotWithBalanceDTO } from "src/server/contracts/pot";
 import { createPotTransferFn } from "src/server/functions/pots.fn";
 import { useAppForm } from "src/shared/form/form-setup";
-import { useFormatCurrency } from "src/shared/hooks/use-format-currency";
 import { useFormatError } from "src/shared/lib/use-format-error";
 import { Alert, AlertDescription } from "src/shared/ui/alert";
 import { Button } from "src/shared/ui/button";
@@ -29,6 +28,7 @@ import {
   DialogTitle,
 } from "src/shared/ui/dialog";
 import { FormField } from "src/shared/ui/form-field";
+import { Money } from "src/shared/ui/money";
 import { Popover, PopoverContent, PopoverTrigger } from "src/shared/ui/popover";
 import { z } from "zod";
 
@@ -58,7 +58,6 @@ export function TransferPotDialog({
   const formId = useId();
   const qc = useQueryClient();
   const { data: pots } = useSuspenseQuery(potsQuery);
-  const { formatFromCent } = useFormatCurrency();
   const formatError = useFormatError();
 
   const mutation = useMutation({
@@ -128,7 +127,6 @@ export function TransferPotDialog({
                     <PotSelectPopover
                       options={available}
                       selected={selected}
-                      formatFromCent={formatFromCent}
                       onSelect={(pot) => {
                         field.handleChange(pot.id);
                         f.setFieldValue("fromPotBalance", pot.balance);
@@ -136,7 +134,7 @@ export function TransferPotDialog({
                     />
                     {selected && (
                       <p className="text-xs text-muted-foreground mt-1">
-                        Max {formatFromCent(selected.balance)}
+                        Max <Money value={selected.balance} />
                       </p>
                     )}
                   </FormField>
@@ -159,7 +157,6 @@ export function TransferPotDialog({
                     <PotSelectPopover
                       options={available}
                       selected={selected}
-                      formatFromCent={formatFromCent}
                       onSelect={(pot) => field.handleChange(pot.id)}
                     />
                   </FormField>
@@ -202,14 +199,12 @@ export function TransferPotDialog({
 type PotSelectPopoverProps = {
   options: PotWithBalanceDTO[];
   selected: PotWithBalanceDTO | undefined;
-  formatFromCent: (cents: number) => string;
   onSelect: (pot: PotWithBalanceDTO) => void;
 };
 
 function PotSelectPopover({
   options,
   selected,
-  formatFromCent,
   onSelect,
 }: PotSelectPopoverProps) {
   const [open, setOpen] = useState(false);
@@ -255,9 +250,10 @@ function PotSelectPopover({
                     style={{ backgroundColor: pot.color }}
                   />
                   <span className="flex-1 truncate">{pot.name}</span>
-                  <span className="text-xs text-muted-foreground ml-2 tabular-nums">
-                    {formatFromCent(pot.balance)}
-                  </span>
+                  <Money
+                    value={pot.balance}
+                    className="text-xs text-muted-foreground ml-2"
+                  />
                 </CommandItem>
               ))}
             </CommandGroup>
