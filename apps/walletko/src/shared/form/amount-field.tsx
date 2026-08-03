@@ -1,5 +1,10 @@
-import type { ComponentProps } from "react";
+import { type ComponentProps, useState } from "react";
 import { useFieldContext } from "src/shared/form/form-setup";
+import {
+  formatAmountDraft,
+  parseAmountDraft,
+  syncAmountDraft,
+} from "src/shared/lib/amount-draft";
 import { useFormatError } from "src/shared/lib/use-format-error";
 import { FormField } from "src/shared/ui/form-field";
 import {
@@ -24,6 +29,17 @@ export function AmountField({
     ? undefined
     : formatError(field.state.meta.errors);
 
+  const [draft, setDraft] = useState(() =>
+    formatAmountDraft(field.state.value),
+  );
+  const value = syncAmountDraft(draft, field.state.value);
+  if (value !== draft) setDraft(value);
+
+  const handleChange = (next: string) => {
+    setDraft(next);
+    field.handleChange(parseAmountDraft(next));
+  };
+
   return (
     <FormField label={label} error={error}>
       <InputGroup>
@@ -35,12 +51,8 @@ export function AmountField({
           min="0.01"
           step="0.01"
           placeholder="0.00"
-          value={field.state.value === 0 ? "" : String(field.state.value)}
-          onChange={(e) =>
-            field.handleChange(
-              e.target.value === "" ? 0 : parseFloat(e.target.value),
-            )
-          }
+          value={value}
+          onChange={(e) => handleChange(e.target.value)}
           onBlur={field.handleBlur}
           aria-invalid={!!error || undefined}
         />
