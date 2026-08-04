@@ -1,6 +1,7 @@
 import { PanelLeft, PanelLeftClose } from "lucide-react";
 import { NavItem } from "src/shared/layout/nav-item";
 import { navItems } from "src/shared/layout/nav-items";
+import { SidebarBalance } from "src/shared/layout/sidebar-balance";
 import { ThemeSwitcher } from "src/shared/layout/theme-switcher";
 import { UserMenu } from "src/shared/layout/user-menu";
 import { cn } from "src/shared/lib/utils";
@@ -10,9 +11,13 @@ import { Logo } from "src/shared/ui/logo";
 export function Sidebar({
   collapsed,
   onToggle,
+  balanceHidden,
+  onToggleBalance,
 }: {
   collapsed: boolean;
   onToggle: () => void;
+  balanceHidden: boolean;
+  onToggleBalance: () => void;
 }) {
   return (
     <aside
@@ -46,6 +51,12 @@ export function Sidebar({
           </Button>
         )}
       </div>
+
+      <SidebarBalance
+        collapsed={collapsed}
+        hidden={balanceHidden}
+        onToggle={onToggleBalance}
+      />
 
       <nav className="flex-1 space-y-0.5">
         {navItems.map(({ to, label, icon }) => (

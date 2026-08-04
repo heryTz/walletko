@@ -5,15 +5,14 @@ import {
   topPotsQuery,
   yearStatsQuery,
 } from "src/features/dashboard/queries";
-import { queryClient } from "src/shared/lib/query-client";
 
 export const Route = createFileRoute("/_authenticated/")({
-  loader: async () => {
+  loader: async ({ context }) => {
     const year = new Date().getFullYear();
     await Promise.all([
-      queryClient.ensureQueryData(overviewStatsQuery),
-      queryClient.ensureQueryData(topPotsQuery()),
-      queryClient.ensureQueryData(yearStatsQuery(year)),
+      context.queryClient.ensureQueryData(overviewStatsQuery),
+      context.queryClient.ensureQueryData(topPotsQuery()),
+      context.queryClient.ensureQueryData(yearStatsQuery(year)),
     ]);
   },
   component: DashboardPage,
