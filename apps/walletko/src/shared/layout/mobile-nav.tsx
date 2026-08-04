@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { MobileAccountTab } from "src/shared/layout/mobile-account-tab";
+import { MobileBalanceStrip } from "src/shared/layout/mobile-balance-strip";
 import {
   mobileTabClass,
   tabIndicatorClass,
@@ -31,9 +32,16 @@ export function MobileTabLink({
   );
 }
 
-export function MobileNav() {
+export function MobileNav({
+  balanceHidden,
+  onToggleBalance,
+}: {
+  balanceHidden: boolean;
+  onToggleBalance: () => void;
+}) {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 backdrop-blur-sm lg:hidden">
+      <MobileBalanceStrip hidden={balanceHidden} onToggle={onToggleBalance} />
       <div className="flex items-stretch pb-safe">
         {primaryNavItems.map(({ to, label, icon }) => (
           <MobileTabLink key={to} to={to} label={label} icon={icon} />

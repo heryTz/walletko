@@ -8,12 +8,25 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "src/shared/ui/tooltip";
 type MoneyProps = {
   value: number;
   human?: boolean;
+  hidden?: boolean;
   className?: string;
 };
 
-export function Money({ value, human, className }: MoneyProps) {
+export function Money({ value, human, hidden, className }: MoneyProps) {
   const { formatFromCent } = useFormatCurrency();
   const exact = formatFromCent(value);
+
+  if (hidden) {
+    return (
+      <span
+        className={cn("tabular-nums", className)}
+        role="img"
+        aria-label="Amount hidden"
+      >
+        ••••••
+      </span>
+    );
+  }
 
   if (!human) {
     return <span className={cn("tabular-nums", className)}>{exact}</span>;

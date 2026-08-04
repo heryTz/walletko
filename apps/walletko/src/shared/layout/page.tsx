@@ -1,6 +1,6 @@
 export function PageContent({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto max-w-4xl space-y-6 px-4 py-6 pb-28 sm:px-6 lg:pb-10">
+    <div className="mx-auto max-w-4xl space-y-6 px-4 py-6 pb-[calc(9rem+env(safe-area-inset-bottom))] sm:px-6 lg:pb-10">
       {children}
     </div>
   );

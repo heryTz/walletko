@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PotsPage } from "src/features/pots/pots-page";
-import { potsQuery, totalBalanceQuery } from "src/features/pots/queries";
-import { queryClient } from "src/shared/lib/query-client";
+import { potsQuery } from "src/features/pots/queries";
+import { totalBalanceQuery } from "src/shared/queries/total-balance";
 
 export const Route = createFileRoute("/_authenticated/pots")({
-  loader: async () => {
+  loader: async ({ context }) => {
     await Promise.all([
-      queryClient.ensureQueryData(potsQuery),
-      queryClient.ensureQueryData(totalBalanceQuery),
+      context.queryClient.ensureQueryData(potsQuery),
+      context.queryClient.ensureQueryData(totalBalanceQuery),
     ]);
   },
   component: PotsPage,

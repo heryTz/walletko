@@ -1,14 +1,20 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
+import type { QueryClient } from "@tanstack/react-query";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  Scripts,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { getAppMetaFn } from "src/server/functions/app-meta.fn";
 import { NotFound } from "src/shared/components/not-found";
-import { queryClient } from "src/shared/lib/query-client";
 
 import appCss from "../styles.css?url";
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
   notFoundComponent: NotFound,
   loader: () => getAppMetaFn(),
   head: () => ({
@@ -47,6 +53,7 @@ const themeInitScript = `(function(){try{var m=localStorage.getItem('theme');var
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   const { version } = Route.useLoaderData();
+  const { queryClient } = Route.useRouteContext();
   return (
     <html lang="en" suppressHydrationWarning>
       <head>

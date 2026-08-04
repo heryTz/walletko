@@ -6,16 +6,15 @@ import {
   viewYearStatsQuery,
 } from "src/features/views/queries";
 import { ViewDetailPage } from "src/features/views/view-detail-page";
-import { queryClient } from "src/shared/lib/query-client";
 
 export const Route = createFileRoute("/_authenticated/views/$viewId")({
-  loader: async ({ params: { viewId } }) => {
+  loader: async ({ context, params: { viewId } }) => {
     const year = new Date().getFullYear();
     await Promise.all([
-      queryClient.ensureQueryData(viewQuery(viewId)),
-      queryClient.ensureQueryData(viewStatsQuery(viewId)),
-      queryClient.ensureQueryData(viewYearStatsQuery(viewId, year)),
-      queryClient.ensureQueryData(tagsQuery),
+      context.queryClient.ensureQueryData(viewQuery(viewId)),
+      context.queryClient.ensureQueryData(viewStatsQuery(viewId)),
+      context.queryClient.ensureQueryData(viewYearStatsQuery(viewId, year)),
+      context.queryClient.ensureQueryData(tagsQuery),
     ]);
   },
   component: ViewDetailPage,

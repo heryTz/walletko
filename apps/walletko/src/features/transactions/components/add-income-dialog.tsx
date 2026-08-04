@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useId } from "react";
 import { dashboardKeys } from "src/features/dashboard/queries";
-import { potsQuery, totalBalanceQuery } from "src/features/pots/queries";
+import { potsQuery } from "src/features/pots/queries";
+import { totalBalanceQuery } from "src/shared/queries/total-balance";
 import { tagKeys, tagsQuery } from "src/features/tags/queries";
 import { useNameSuggestions } from "src/features/transactions/hooks/use-name-suggestions";
 import { transactionKeys } from "src/features/transactions/queries";

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useId } from "react";
-import { potsQuery, totalBalanceQuery } from "src/features/pots/queries";
+import { potsQuery } from "src/features/pots/queries";
+import { totalBalanceQuery } from "src/shared/queries/total-balance";
 import { addPotFn } from "src/server/functions/pots.fn";
 import type { ModalAllocation } from "src/shared/components/allocation-disc";
 import { useAppForm } from "src/shared/form/form-setup";
