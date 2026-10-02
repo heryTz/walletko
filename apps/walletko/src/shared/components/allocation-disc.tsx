@@ -157,7 +157,6 @@ export function AllocationDisc({
     const onChangeFn = onChange;
     e.preventDefault();
     e.currentTarget.setPointerCapture(e.pointerId);
-    // biome-ignore lint/style/noNonNullAssertion: ref is set before any pointer event fires
     const svg = svgRef.current!;
     const N = pots.length;
     const startPositions = basePositions;

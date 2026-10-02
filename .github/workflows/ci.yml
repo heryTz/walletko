@@ -33,6 +33,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Biome
+        run: pnpm exec biome ci .
+
       # Build before tests: `pnpm test` is vitest only and never runs vite /
       # esbuild, so without this a broken build reaches main untested.
       - name: Build

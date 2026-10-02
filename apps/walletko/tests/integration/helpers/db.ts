@@ -1,7 +1,7 @@
+import fs from "node:fs";
+import path from "node:path";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
-import fs from "fs";
-import path from "path";
 import { Pool } from "pg";
 import * as schema from "src/server/infrastructure/db/schema";
 import { URL_FILE } from "../setup";

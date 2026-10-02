@@ -40,14 +40,10 @@ class NodemailerMailer implements Mailer {
 
 // env is read once at the module boundary, not inside the class
 export const mailer: Mailer = new NodemailerMailer({
-  // biome-ignore lint/style/noNonNullAssertion: required env vars asserted at startup
   host: process.env.SMTP_HOST!,
   port: Number(process.env.SMTP_PORT ?? 587),
   secure: process.env.SMTP_SECURE === "true",
-  // biome-ignore lint/style/noNonNullAssertion: required env vars asserted at startup
   user: process.env.SMTP_USER!,
-  // biome-ignore lint/style/noNonNullAssertion: required env vars asserted at startup
   pass: process.env.SMTP_PASS!,
-  // biome-ignore lint/style/noNonNullAssertion: required env vars asserted at startup
   from: process.env.EMAIL_FROM!,
 });
