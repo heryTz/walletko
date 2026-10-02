@@ -6,6 +6,7 @@ import {
   potAllocations,
   pots,
 } from "src/server/infrastructure/db/schema";
+
 export type { PotWithBalanceDTO };
 
 export class DrizzleListPotsQuery {

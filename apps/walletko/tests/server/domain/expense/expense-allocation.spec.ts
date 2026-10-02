@@ -1,5 +1,5 @@
-import { Money } from "src/server/domain/shared/value-object/money";
 import { makeExpenseAllocation } from "src/server/domain/expense/expense-allocation.factory";
+import { Money } from "src/server/domain/shared/value-object/money";
 
 describe("expense allocation", () => {
   it("adjust amount", () => {

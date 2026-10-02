@@ -1,9 +1,9 @@
 import { AddTagService } from "src/server/application/tag/add-tag.service";
-import { InMemoryTagRepository } from "src/server/infrastructure/tag/in-memory-tag.repository";
-import { InMemoryUnitOfWork } from "src/server/infrastructure/shared/in-memory-unit-of-work";
-import { TagNameConflictError } from "src/server/domain/tag/tag-name-conflict.error";
-import { makeTag } from "src/server/domain/tag/tag.factory";
 import { Id } from "src/server/domain/shared/value-object/id";
+import { makeTag } from "src/server/domain/tag/tag.factory";
+import { TagNameConflictError } from "src/server/domain/tag/tag-name-conflict.error";
+import { InMemoryUnitOfWork } from "src/server/infrastructure/shared/in-memory-unit-of-work";
+import { InMemoryTagRepository } from "src/server/infrastructure/tag/in-memory-tag.repository";
 
 describe("AddTagService", () => {
   const userId = Id.generate().value;

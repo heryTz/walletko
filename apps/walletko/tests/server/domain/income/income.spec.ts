@@ -1,10 +1,10 @@
+import { Income } from "src/server/domain/income/income";
 import { makePot } from "src/server/domain/pot-collection/pot.factory";
 import { Datetime } from "src/server/domain/shared/value-object/datetime";
 import { Id } from "src/server/domain/shared/value-object/id";
 import { Money } from "src/server/domain/shared/value-object/money";
 import { Name } from "src/server/domain/shared/value-object/name";
 import { Percentage } from "src/server/domain/shared/value-object/percentage";
-import { Income } from "src/server/domain/income/income";
 
 const userId = Id.generate();
 

@@ -1,3 +1,4 @@
+import { Expense } from "src/server/domain/expense/expense";
 import {
   makePot,
   makePotSnapshot,
@@ -5,7 +6,6 @@ import {
 import { Id } from "src/server/domain/shared/value-object/id";
 import { Money } from "src/server/domain/shared/value-object/money";
 import { Name } from "src/server/domain/shared/value-object/name";
-import { Expense } from "src/server/domain/expense/expense";
 
 const userId = Id.generate();
 

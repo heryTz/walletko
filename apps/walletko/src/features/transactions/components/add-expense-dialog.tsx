@@ -4,7 +4,6 @@ import { useEffect, useId } from "react";
 import { dashboardKeys } from "src/features/dashboard/queries";
 import { PotPicker } from "src/features/pots/components/pot-picker";
 import { potsQuery } from "src/features/pots/queries";
-import { totalBalanceQuery } from "src/shared/queries/total-balance";
 import { tagKeys, tagsQuery } from "src/features/tags/queries";
 import { useNameSuggestions } from "src/features/transactions/hooks/use-name-suggestions";
 import { transactionKeys } from "src/features/transactions/queries";
@@ -12,6 +11,7 @@ import type { PotWithBalanceDTO } from "src/server/contracts/pot";
 import { payExpenseFn } from "src/server/functions/expense.fn";
 import { useAppForm } from "src/shared/form/form-setup";
 import { useFormatError } from "src/shared/lib/use-format-error";
+import { totalBalanceQuery } from "src/shared/queries/total-balance";
 import { Alert, AlertDescription } from "src/shared/ui/alert";
 import { Button } from "src/shared/ui/button";
 import {

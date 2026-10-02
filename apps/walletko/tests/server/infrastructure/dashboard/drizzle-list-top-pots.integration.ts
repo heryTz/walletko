@@ -1,13 +1,13 @@
 import { createId } from "@paralleldrive/cuid2";
+import { DrizzleListTopPotsQuery } from "src/server/infrastructure/dashboard/drizzle-list-top-pots.query";
 import { createTestDb, type TestDb } from "tests/integration/helpers/db";
-import { truncateAll } from "tests/integration/helpers/truncate";
 import {
   insertExpenseAllocation,
   insertPot,
   insertPotAllocation,
   insertTransaction,
 } from "tests/integration/helpers/fixtures";
-import { DrizzleListTopPotsQuery } from "src/server/infrastructure/dashboard/drizzle-list-top-pots.query";
+import { truncateAll } from "tests/integration/helpers/truncate";
 
 describe("DrizzleListTopPotsQuery", () => {
   let db: TestDb;

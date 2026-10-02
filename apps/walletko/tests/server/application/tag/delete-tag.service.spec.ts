@@ -1,8 +1,8 @@
 import { DeleteTagService } from "src/server/application/tag/delete-tag.service";
-import { InMemoryTagRepository } from "src/server/infrastructure/tag/in-memory-tag.repository";
-import { InMemoryUnitOfWork } from "src/server/infrastructure/shared/in-memory-unit-of-work";
-import { makeTag } from "src/server/domain/tag/tag.factory";
 import { Id } from "src/server/domain/shared/value-object/id";
+import { makeTag } from "src/server/domain/tag/tag.factory";
+import { InMemoryUnitOfWork } from "src/server/infrastructure/shared/in-memory-unit-of-work";
+import { InMemoryTagRepository } from "src/server/infrastructure/tag/in-memory-tag.repository";
 
 describe("DeleteTagService", () => {
   const userId = Id.generate().value;

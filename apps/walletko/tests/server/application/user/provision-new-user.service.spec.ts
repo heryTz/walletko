@@ -1,9 +1,9 @@
 import { ProvisionNewUserService } from "src/server/application/user/provision-new-user.service";
-import { InMemoryPotRepository } from "src/server/infrastructure/pot-collection/in-memory-pot.repository";
-import { InMemoryIncomeRepository } from "src/server/infrastructure/income/in-memory-income.repository";
-import { InMemoryExpenseRepository } from "src/server/infrastructure/expense/in-memory-expense.repository";
-import { InMemoryUnitOfWork } from "src/server/infrastructure/shared/in-memory-unit-of-work";
 import { Id } from "src/server/domain/shared/value-object/id";
+import { InMemoryExpenseRepository } from "src/server/infrastructure/expense/in-memory-expense.repository";
+import { InMemoryIncomeRepository } from "src/server/infrastructure/income/in-memory-income.repository";
+import { InMemoryPotRepository } from "src/server/infrastructure/pot-collection/in-memory-pot.repository";
+import { InMemoryUnitOfWork } from "src/server/infrastructure/shared/in-memory-unit-of-work";
 
 describe("provision new user", () => {
   const userId = Id.generate().value;

@@ -11,8 +11,8 @@ import { Id } from "src/server/domain/shared/value-object/id";
 import { Money } from "src/server/domain/shared/value-object/money";
 import { Name } from "src/server/domain/shared/value-object/name";
 import { InMemoryExpenseRepository } from "src/server/infrastructure/expense/in-memory-expense.repository";
-import { InMemoryIncomeCancellationRepository } from "src/server/infrastructure/income/in-memory-income-cancellation.repository";
 import { InMemoryIncomeRepository } from "src/server/infrastructure/income/in-memory-income.repository";
+import { InMemoryIncomeCancellationRepository } from "src/server/infrastructure/income/in-memory-income-cancellation.repository";
 import { InMemoryPotRepository } from "src/server/infrastructure/pot-collection/in-memory-pot.repository";
 import { InMemoryUnitOfWork } from "src/server/infrastructure/shared/in-memory-unit-of-work";
 

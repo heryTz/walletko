@@ -1,6 +1,6 @@
 import { UpdateUserNameService } from "src/server/application/user/update-user-name.service";
-import type { UserRepository } from "src/server/domain/user/user.repository";
 import { Id } from "src/server/domain/shared/value-object/id";
+import type { UserRepository } from "src/server/domain/user/user.repository";
 
 describe("update user name", () => {
   let updateNameFn: ReturnType<typeof vi.fn>;

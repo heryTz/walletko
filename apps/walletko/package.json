@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:unit": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
-    "format": "biome format --write",
+    "format": "biome check --write --linter-enabled=false",
     "lint": "biome lint",
     "check": "biome check",
     "typecheck": "tsc --noEmit",
@@ -55,7 +55,7 @@
     "zod": "^4.3.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.5",
+    "@biomejs/biome": "2.5.12",
     "@faker-js/faker": "^8.4.1",
     "@tailwindcss/typography": "^0.5.16",
     "@tanstack/devtools-vite": "latest",

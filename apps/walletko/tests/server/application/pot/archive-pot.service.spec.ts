@@ -1,16 +1,16 @@
 import { ArchivePotService } from "src/server/application/pot/archive-pot.service";
-import { InMemoryPotRepository } from "src/server/infrastructure/pot-collection/in-memory-pot.repository";
-import { InMemoryPotTransferRepository } from "src/server/infrastructure/pot-collection/in-memory-pot-transfer.repository";
-import { InMemoryIncomeRepository } from "src/server/infrastructure/income/in-memory-income.repository";
-import { InMemoryExpenseRepository } from "src/server/infrastructure/expense/in-memory-expense.repository";
-import { InMemoryUnitOfWork } from "src/server/infrastructure/shared/in-memory-unit-of-work";
 import {
   makePot,
   makePotSnapshot,
 } from "src/server/domain/pot-collection/pot.factory";
-import { Percentage } from "src/server/domain/shared/value-object/percentage";
 import { Id } from "src/server/domain/shared/value-object/id";
 import { Money } from "src/server/domain/shared/value-object/money";
+import { Percentage } from "src/server/domain/shared/value-object/percentage";
+import { InMemoryExpenseRepository } from "src/server/infrastructure/expense/in-memory-expense.repository";
+import { InMemoryIncomeRepository } from "src/server/infrastructure/income/in-memory-income.repository";
+import { InMemoryPotRepository } from "src/server/infrastructure/pot-collection/in-memory-pot.repository";
+import { InMemoryPotTransferRepository } from "src/server/infrastructure/pot-collection/in-memory-pot-transfer.repository";
+import { InMemoryUnitOfWork } from "src/server/infrastructure/shared/in-memory-unit-of-work";
 
 describe("ArchivePotService", () => {
   const userId = Id.generate().value;

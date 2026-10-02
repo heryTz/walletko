@@ -1,8 +1,8 @@
 import { DeleteViewService } from "src/server/application/saved-view/delete-view.service";
-import { InMemorySavedViewRepository } from "src/server/infrastructure/saved-view/in-memory-saved-view.repository";
-import { InMemoryUnitOfWork } from "src/server/infrastructure/shared/in-memory-unit-of-work";
 import { makeSavedView } from "src/server/domain/saved-view/saved-view.factory";
 import { Id } from "src/server/domain/shared/value-object/id";
+import { InMemorySavedViewRepository } from "src/server/infrastructure/saved-view/in-memory-saved-view.repository";
+import { InMemoryUnitOfWork } from "src/server/infrastructure/shared/in-memory-unit-of-work";
 
 describe("DeleteViewService", () => {
   const userId = Id.generate().value;

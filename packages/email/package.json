@@ -9,6 +9,7 @@
   "scripts": {
     "test": "vitest run",
     "dev": "email dev -p 3001 --dir src",
+    "format": "biome check --write --linter-enabled=false",
     "check": "biome check",
     "lint": "biome lint"
   },
@@ -20,7 +21,7 @@
     "@react-email/render": "latest"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.5",
+    "@biomejs/biome": "2.5.12",
     "@react-email/preview-server": "5.2.10",
     "@types/react": "^19.0.0",
     "@vitejs/plugin-react": "^6.0.0",

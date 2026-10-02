@@ -1,8 +1,8 @@
-import { InMemoryExpenseRepository } from "src/server/infrastructure/expense/in-memory-expense.repository";
-import { InMemoryUnitOfWork } from "src/server/infrastructure/shared/in-memory-unit-of-work";
 import { UpdateExpenseService } from "src/server/application/expense/update-expense.service";
 import { makeExpense } from "src/server/domain/expense/expense.factory";
 import { Id } from "src/server/domain/shared/value-object/id";
+import { InMemoryExpenseRepository } from "src/server/infrastructure/expense/in-memory-expense.repository";
+import { InMemoryUnitOfWork } from "src/server/infrastructure/shared/in-memory-unit-of-work";
 
 describe("update expense", () => {
   const userId = Id.generate().value;

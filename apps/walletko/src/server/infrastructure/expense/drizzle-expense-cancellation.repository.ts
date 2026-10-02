@@ -8,7 +8,9 @@ import {
 } from "src/server/infrastructure/db/schema";
 import type { DrizzleTx } from "src/server/infrastructure/shared/drizzle-unit-of-work";
 
-export class DrizzleExpenseCancellationRepository implements ExpenseCancellationRepository {
+export class DrizzleExpenseCancellationRepository
+  implements ExpenseCancellationRepository
+{
   constructor(private uow: UnitOfWork<DrizzleTx>) {}
 
   async save(cancellation: ExpenseCancellation): Promise<void> {

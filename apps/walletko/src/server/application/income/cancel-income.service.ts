@@ -1,7 +1,7 @@
 import { CancelIncomeBlockedError } from "src/server/domain/income/cancel-income-blocked.error";
+import type { IncomeRepository } from "src/server/domain/income/income.repository";
 import { IncomeCancellation } from "src/server/domain/income/income-cancellation";
 import type { IncomeCancellationRepository } from "src/server/domain/income/income-cancellation.repository";
-import type { IncomeRepository } from "src/server/domain/income/income.repository";
 import type { PotRepository } from "src/server/domain/pot-collection/pot.repository";
 import type { UnitOfWork } from "src/server/domain/shared/unit-of-work";
 import { Id } from "src/server/domain/shared/value-object/id";

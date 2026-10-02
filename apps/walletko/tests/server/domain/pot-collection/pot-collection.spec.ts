@@ -1,9 +1,9 @@
+import { makePot } from "src/server/domain/pot-collection/pot.factory";
+import { PotCollection } from "src/server/domain/pot-collection/pot-collection";
+import { Color } from "src/server/domain/shared/value-object/color";
 import { Id } from "src/server/domain/shared/value-object/id";
 import { Name } from "src/server/domain/shared/value-object/name";
 import { Percentage } from "src/server/domain/shared/value-object/percentage";
-import { Color } from "src/server/domain/shared/value-object/color";
-import { PotCollection } from "src/server/domain/pot-collection/pot-collection";
-import { makePot } from "src/server/domain/pot-collection/pot.factory";
 
 describe("pot collection", () => {
   it("throws when pot is empty", () => {
