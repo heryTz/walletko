@@ -1,12 +1,12 @@
 import { createId } from "@paralleldrive/cuid2";
+import { DrizzleListTransactionsQuery } from "src/server/infrastructure/transaction/drizzle-list-transactions.query";
 import { createTestDb, type TestDb } from "tests/integration/helpers/db";
-import { truncateAll } from "tests/integration/helpers/truncate";
 import {
   insertTag,
   insertTransaction,
   insertTransactionTag,
 } from "tests/integration/helpers/fixtures";
-import { DrizzleListTransactionsQuery } from "src/server/infrastructure/transaction/drizzle-list-transactions.query";
+import { truncateAll } from "tests/integration/helpers/truncate";
 
 const defaultParams = { page: 1, pageSize: 20 };
 

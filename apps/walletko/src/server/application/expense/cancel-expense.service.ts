@@ -1,6 +1,6 @@
+import type { ExpenseRepository } from "src/server/domain/expense/expense.repository";
 import { ExpenseCancellation } from "src/server/domain/expense/expense-cancellation";
 import type { ExpenseCancellationRepository } from "src/server/domain/expense/expense-cancellation.repository";
-import type { ExpenseRepository } from "src/server/domain/expense/expense.repository";
 import type { PotRepository } from "src/server/domain/pot-collection/pot.repository";
 import type { UnitOfWork } from "src/server/domain/shared/unit-of-work";
 import { Id } from "src/server/domain/shared/value-object/id";

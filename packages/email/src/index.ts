@@ -1,2 +1,1 @@
-export { default as OtpEmail } from "./templates/otp-email";
-export { renderOtpEmail } from "./templates/otp-email";
+export { default as OtpEmail, renderOtpEmail } from "./templates/otp-email";

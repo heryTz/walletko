@@ -1,10 +1,10 @@
 import { AddPotService } from "src/server/application/pot/add-pot.service";
-import { InMemoryIncomeRepository } from "src/server/infrastructure/income/in-memory-income.repository";
-import { InMemoryExpenseRepository } from "src/server/infrastructure/expense/in-memory-expense.repository";
-import { InMemoryPotRepository } from "src/server/infrastructure/pot-collection/in-memory-pot.repository";
 import { makePot } from "src/server/domain/pot-collection/pot.factory";
-import { Percentage } from "src/server/domain/shared/value-object/percentage";
 import { Id } from "src/server/domain/shared/value-object/id";
+import { Percentage } from "src/server/domain/shared/value-object/percentage";
+import { InMemoryExpenseRepository } from "src/server/infrastructure/expense/in-memory-expense.repository";
+import { InMemoryIncomeRepository } from "src/server/infrastructure/income/in-memory-income.repository";
+import { InMemoryPotRepository } from "src/server/infrastructure/pot-collection/in-memory-pot.repository";
 import { InMemoryUnitOfWork } from "src/server/infrastructure/shared/in-memory-unit-of-work";
 
 describe("add pot", () => {

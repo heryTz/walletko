@@ -10,6 +10,10 @@
       "persistent": true
     },
     "lint": {},
+    "format": {
+      "cache": false
+    },
+    "check": {},
     "test": {
       "cache": false
     }

@@ -1,6 +1,6 @@
+import { makePotAllocation } from "src/server/domain/income/pot-allocation.factory";
 import { Money } from "src/server/domain/shared/value-object/money";
 import { Percentage } from "src/server/domain/shared/value-object/percentage";
-import { makePotAllocation } from "src/server/domain/income/pot-allocation.factory";
 
 describe("pot allocation", () => {
   it("adjust amount", () => {

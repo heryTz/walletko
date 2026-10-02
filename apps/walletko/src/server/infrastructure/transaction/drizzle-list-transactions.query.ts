@@ -15,6 +15,7 @@ export type ListTransactionsParams = {
 };
 
 import type { TransactionDTO } from "src/server/contracts/transaction";
+
 export type { TransactionDTO };
 
 export type ListTransactionsResult = {

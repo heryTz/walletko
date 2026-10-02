@@ -70,7 +70,7 @@ function ButtonGroupSeparator({
 
 export {
   ButtonGroup,
-  ButtonGroupText,
   ButtonGroupSeparator,
+  ButtonGroupText,
   buttonGroupVariants,
 };

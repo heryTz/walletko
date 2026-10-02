@@ -7,15 +7,17 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
+    "format": "turbo format",
+    "check": "turbo check",
     "test": "turbo test",
     "prepare": "husky"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.12",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
-    "prettier": "^3.7.4",
     "turbo": "^2.9.6"
   },
   "commitlint": {
@@ -24,7 +26,7 @@
     ]
   },
   "lint-staged": {
-    "apps/**/*.(ts|tsx)": "prettier --write"
+    "*.{js,jsx,ts,tsx,json,jsonc,css,html}": "biome check --write --no-errors-on-unmatched"
   },
   "pnpm": {
     "overrides": {
@@ -53,11 +55,14 @@
       "@tailwindcss/oxide",
       "better-sqlite3",
       "core-js",
+      "cpu-features",
       "esbuild",
       "lightningcss",
       "msw",
       "prisma",
+      "protobufjs",
       "sharp",
+      "ssh2",
       "unrs-resolver"
     ]
   }

@@ -1,13 +1,13 @@
 import { createId } from "@paralleldrive/cuid2";
+import { DrizzleGetYearStatsQuery } from "src/server/infrastructure/dashboard/drizzle-get-year-stats.query";
 import { createTestDb, type TestDb } from "tests/integration/helpers/db";
-import { truncateAll } from "tests/integration/helpers/truncate";
 import {
   insertExpenseAllocation,
   insertPot,
   insertPotAllocation,
   insertTransaction,
 } from "tests/integration/helpers/fixtures";
-import { DrizzleGetYearStatsQuery } from "src/server/infrastructure/dashboard/drizzle-get-year-stats.query";
+import { truncateAll } from "tests/integration/helpers/truncate";
 
 describe("DrizzleGetYearStatsQuery", () => {
   let db: TestDb;

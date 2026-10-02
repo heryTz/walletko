@@ -1,9 +1,9 @@
 import { CreateViewService } from "src/server/application/saved-view/create-view.service";
+import { makeSavedView } from "src/server/domain/saved-view/saved-view.factory";
+import { SavedViewNameConflictError } from "src/server/domain/saved-view/saved-view-name-conflict.error";
+import { Id } from "src/server/domain/shared/value-object/id";
 import { InMemorySavedViewRepository } from "src/server/infrastructure/saved-view/in-memory-saved-view.repository";
 import { InMemoryUnitOfWork } from "src/server/infrastructure/shared/in-memory-unit-of-work";
-import { SavedViewNameConflictError } from "src/server/domain/saved-view/saved-view-name-conflict.error";
-import { makeSavedView } from "src/server/domain/saved-view/saved-view.factory";
-import { Id } from "src/server/domain/shared/value-object/id";
 
 describe("CreateViewService", () => {
   const userId = Id.generate().value;

@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useId } from "react";
 import { potsQuery } from "src/features/pots/queries";
-import { totalBalanceQuery } from "src/shared/queries/total-balance";
 import { editAllocationFn } from "src/server/functions/pots.fn";
 import type { ModalAllocation } from "src/shared/components/allocation-disc";
 import { useAppForm } from "src/shared/form/form-setup";
+import { totalBalanceQuery } from "src/shared/queries/total-balance";
 import { Alert, AlertDescription } from "src/shared/ui/alert";
 import { Button } from "src/shared/ui/button";
 import {

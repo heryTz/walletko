@@ -1,12 +1,12 @@
 import { createId } from "@paralleldrive/cuid2";
+import { DrizzleListTagsQuery } from "src/server/infrastructure/tag/drizzle-list-tags.query";
 import { createTestDb, type TestDb } from "tests/integration/helpers/db";
-import { truncateAll } from "tests/integration/helpers/truncate";
 import {
   insertTag,
   insertTransaction,
   insertTransactionTag,
 } from "tests/integration/helpers/fixtures";
-import { DrizzleListTagsQuery } from "src/server/infrastructure/tag/drizzle-list-tags.query";
+import { truncateAll } from "tests/integration/helpers/truncate";
 
 describe("DrizzleListTagsQuery", () => {
   let db: TestDb;

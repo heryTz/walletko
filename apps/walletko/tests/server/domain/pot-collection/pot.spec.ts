@@ -1,6 +1,6 @@
+import { makePot } from "src/server/domain/pot-collection/pot.factory";
 import { Color } from "src/server/domain/shared/value-object/color";
 import { Name } from "src/server/domain/shared/value-object/name";
-import { makePot } from "src/server/domain/pot-collection/pot.factory";
 
 describe("Pot", () => {
   it("changeColor updates color and sets updatedAt", () => {

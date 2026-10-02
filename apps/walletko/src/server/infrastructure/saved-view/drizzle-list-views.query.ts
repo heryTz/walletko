@@ -2,6 +2,7 @@ import { asc, eq } from "drizzle-orm";
 import type { SavedViewListItem } from "src/server/contracts/saved-view";
 import type { DrizzleDb } from "src/server/infrastructure/db/client";
 import { savedViews } from "src/server/infrastructure/db/schema";
+
 export type { SavedViewListItem };
 
 export class DrizzleListViewsQuery {

@@ -5,8 +5,8 @@ import {
   potAllocations,
   pots,
   tags,
-  transactionTags,
   transactions,
+  transactionTags,
 } from "src/server/infrastructure/db/schema";
 import type { TestDb } from "./db";
 
