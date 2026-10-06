@@ -26,7 +26,7 @@ type PageFabProps = {
 };
 
 const FAB_CLASS =
-  "lg:hidden fixed bottom-20 right-4 z-40 size-14 rounded-full shadow-lg";
+  "lg:hidden fixed bottom-26 right-4 z-40 size-14 rounded-full shadow-lg";
 
 export function PageFab({
   icon,
