@@ -4,14 +4,13 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
-    globalSetup: "./tests/integration/setup.ts",
     projects: [
       {
         test: {
           name: "unit",
           environment: "node",
           globals: true,
-          include: ["tests/server/**/*.spec.ts"],
+          include: ["tests/server/**/*.spec.ts", "src/**/*.spec.ts"],
         },
       },
       {
@@ -19,6 +18,7 @@ export default defineConfig({
           name: "integration",
           environment: "node",
           globals: true,
+          globalSetup: "./tests/integration/setup.ts",
           include: ["tests/server/**/*.integration.ts"],
         },
       },
