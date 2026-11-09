@@ -1,11 +1,13 @@
 // If it's work, it's a good code hahahha. @tsoding
 // I tried to implement it manually and here is the result.
 // TODO: check Largest remainder method
-export function proportionalDistribution(
-  index: number,
-  newValue: number,
-  percentages: number[],
-): number[] {
+export function proportionalDistribution(params: {
+  index: number;
+  newValue: number;
+  percentages: number[];
+}): number[] {
+  const { index, newValue, percentages } = params;
+
   if (percentages.length === 1) {
     return [100];
   }
